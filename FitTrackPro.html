@@ -1,0 +1,1273 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="theme-color" content="#090910"/>
+<title>FitTrack Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;600;700;800&family=Barlow+Condensed:wght@600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:#090910;overscroll-behavior:none}
+body{font-family:'Barlow',sans-serif;color:#fff;overflow:hidden}
+:root{--g:#10B981;--o:#F97316;--b:#3B82F6;--p:#A855F7;--y:#F59E0B;--r:#EF4444;--cy:#06B6D4}
+
+#app{max-width:430px;margin:0 auto;height:100vh;display:flex;flex-direction:column;background:#090910;position:relative;overflow:hidden}
+
+/* ── AUTH ── */
+#auth-wrap{position:absolute;inset:0;background:linear-gradient(160deg,#0d1117 0%,#0a1628 50%,#090910 100%);z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;overflow-y:auto}
+.auth-logo{font-family:'Bebas Neue';font-size:48px;letter-spacing:3px;color:#fff;margin-bottom:4px;text-shadow:0 0 40px rgba(16,185,129,.5)}
+.auth-logo span{color:var(--g)}
+.auth-sub{font-size:13px;color:rgba(255,255,255,.45);font-weight:700;text-transform:uppercase;letter-spacing:2px;margin-bottom:36px}
+.auth-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:24px;padding:28px 24px;width:100%;max-width:360px}
+.auth-tabs{display:flex;background:rgba(255,255,255,.06);border-radius:12px;padding:3px;margin-bottom:24px}
+.auth-tab{flex:1;padding:8px;border-radius:9px;border:none;background:none;color:rgba(255,255,255,.45);font-family:Barlow;font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.5px;cursor:pointer;transition:all .2s}
+.auth-tab.active{background:var(--g);color:#fff}
+.auth-field{margin-bottom:14px}
+.auth-field label{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:rgba(255,255,255,.45);margin-bottom:6px}
+.auth-field input{width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:13px 15px;color:#fff;font-family:Barlow;font-size:15px;font-weight:600;outline:none;transition:border-color .2s}
+.auth-field input:focus{border-color:var(--g)}
+.auth-err{background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);border-radius:10px;padding:10px 14px;font-size:13px;color:#EF4444;font-weight:600;margin-bottom:14px;display:none}
+.auth-submit{width:100%;padding:14px;border-radius:13px;border:none;background:linear-gradient(135deg,#10B981,#059669);color:#fff;font-family:'Barlow Condensed';font-size:17px;font-weight:800;text-transform:uppercase;letter-spacing:1px;cursor:pointer;margin-top:6px;box-shadow:0 4px 20px rgba(16,185,129,.4);transition:all .2s}
+.auth-submit:active{transform:scale(.97)}
+.demo-hint{margin-top:16px;text-align:center;font-size:11px;color:rgba(255,255,255,.3);font-weight:600}
+.demo-hint strong{color:rgba(255,255,255,.55)}
+
+/* ── STATUSBAR ── */
+#statusbar{padding:12px 18px 4px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;background:#090910}
+#statusbar .time{font-size:13px;font-weight:700;color:rgba(255,255,255,.55)}
+#statusbar .icons{font-size:11px;color:rgba(255,255,255,.45);display:flex;align-items:center;gap:8px}
+
+/* ── SCREEN ── */
+#screen{flex:1;overflow-y:auto;overflow-x:hidden;padding:0 18px 88px}
+#screen::-webkit-scrollbar{display:none}
+.page{display:none}.page.active{display:block}
+
+/* ── NAV ── */
+#nav{position:absolute;bottom:0;left:0;right:0;background:rgba(9,9,16,.97);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid rgba(255,255,255,.07);display:flex;padding:10px 10px 20px;z-index:100}
+.nb{flex:1;display:flex;flex-direction:column;align-items:center;gap:3;background:none;border:none;cursor:pointer;color:rgba(255,255,255,.3);transition:color .2s;padding:4px 2px;outline:none}
+.nb.on{color:var(--g)}
+.nb .ni{font-size:19px;line-height:1}
+.nb .nl{font-size:9px;font-family:Barlow;font-weight:800;text-transform:uppercase;letter-spacing:.5px}
+
+/* ── CARDS ── */
+.card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:18px}
+.sec{font-family:'Bebas Neue';font-size:12px;letter-spacing:2px;color:rgba(255,255,255,.35);text-transform:uppercase;margin:20px 0 9px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px}
+.sc{background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.09);border-radius:15px;padding:12px 13px;display:flex;flex-direction:column;gap:3px}
+.sv{font-family:'Bebas Neue';font-size:22px;line-height:1;letter-spacing:1px}
+.sl{font-size:10px;color:rgba(255,255,255,.42);font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.big-btn{width:100%;padding:14px;border-radius:14px;border:none;font-family:'Barlow Condensed';font-size:17px;font-weight:800;text-transform:uppercase;letter-spacing:1px;cursor:pointer;transition:all .18s;display:flex;align-items:center;justify-content:center;gap:7px;outline:none}
+.big-btn:active{transform:scale(.96)}
+.badge{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;font-family:'Barlow Condensed';font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.5px}
+.hi-row{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-radius:13px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);margin-bottom:7px}
+.pulse{animation:pu 2s infinite}
+@keyframes pu{0%,100%{opacity:1}50%{opacity:.35}}
+.su{animation:su .3s ease forwards}
+@keyframes su{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.divider{width:1px;height:36px;background:rgba(255,255,255,.1)}
+.prog-bar{height:4px;background:rgba(255,255,255,.09);border-radius:4px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--g),#34D399);border-radius:4px;transition:width .5s}
+.ring-wrap{position:relative;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ring-inner{position:absolute;text-align:center}
+input[type=range]{-webkit-appearance:none;width:100%;height:4px;border-radius:4px;background:rgba(255,255,255,.12);outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--g);cursor:pointer;box-shadow:0 0 8px rgba(16,185,129,.5)}
+
+/* ── CYCLING SPECIFIC ── */
+.cy-card{background:linear-gradient(135deg,rgba(6,182,212,.12),rgba(6,182,212,.05));border:1px solid rgba(6,182,212,.2);border-radius:18px;padding:16px}
+.cy-power{background:linear-gradient(135deg,rgba(245,158,11,.15),rgba(249,115,22,.08));border:1px solid rgba(245,158,11,.25);border-radius:16px;padding:14px;text-align:center}
+.cy-seg{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:11px 14px;display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.sensor-bar{background:rgba(255,255,255,.04);border-radius:12px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.sensor-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.sensor-dot.on{background:var(--g);box-shadow:0 0 6px var(--g)}
+.sensor-dot.off{background:#666}
+.trophy-card{text-align:center;padding:11px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.07);border-radius:14px}
+.trophy-card.earned{border-color:rgba(245,158,11,.35)}
+.trophy-card.locked{opacity:.38}
+.act-btn{background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.1);border-radius:13px;padding:13px 11px;cursor:pointer;display:flex;flex-direction:column;gap:3px;align-items:flex-start;transition:all .18s;text-align:left;width:100%}
+
+/* BAR/LINE charts */
+.bar-chart{display:flex;align-items:flex-end;gap:5px;height:88px;padding:0 2px}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.bar-fill{width:100%;border-radius:4px 4px 0 0;min-height:3px}
+.bar-lbl{font-size:9px;font-weight:700;color:rgba(255,255,255,.38);font-family:Barlow}
+
+/* GPS canvas */
+#route-canvas{width:100%;height:100%;border-radius:13px;display:block}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- ═══ AUTH SCREEN ═══ -->
+<div id="auth-wrap">
+  <div class="auth-logo">FIT<span>TRACK</span></div>
+  <div class="auth-sub">Votre coach fitness personnel</div>
+
+  <div class="auth-card">
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tab-login"  onclick="switchAuth('login')">Connexion</button>
+      <button class="auth-tab"        id="tab-signup" onclick="switchAuth('signup')">Créer un compte</button>
+    </div>
+
+    <!-- LOGIN -->
+    <div id="form-login">
+      <div class="auth-err" id="err-login"></div>
+      <div class="auth-field"><label>Email</label>
+        <input id="li-email" type="email" placeholder="exemple@mail.com" autocomplete="email"/></div>
+      <div class="auth-field"><label>Mot de passe</label>
+        <input id="li-pwd" type="password" placeholder="••••••••" autocomplete="current-password"/></div>
+      <button class="auth-submit" onclick="doLogin()">Se connecter</button>
+      <div class="demo-hint">Démo : <strong>demo@fit.com</strong> / <strong>demo123</strong></div>
+    </div>
+
+    <!-- SIGNUP -->
+    <div id="form-signup" style="display:none">
+      <div class="auth-err" id="err-signup"></div>
+      <div class="auth-field"><label>Prénom</label>
+        <input id="su-name" type="text" placeholder="Votre prénom"/></div>
+      <div class="auth-field"><label>Email</label>
+        <input id="su-email" type="email" placeholder="exemple@mail.com"/></div>
+      <div class="auth-field"><label>Mot de passe (6+ car.)</label>
+        <input id="su-pwd" type="password" placeholder="••••••••"/></div>
+      <div class="auth-field"><label>Poids (kg)</label>
+        <input id="su-weight" type="number" placeholder="70" value="70" min="30" max="200"/></div>
+      <button class="auth-submit" onclick="doSignup()">Créer le compte</button>
+    </div>
+  </div>
+</div><!-- /auth-wrap -->
+
+<!-- ═══ MAIN APP ═══ -->
+<div id="statusbar">
+  <span class="time" id="clock">--:--</span>
+  <div class="icons">
+    <span id="trk-dot" style="font-size:8px;color:var(--g);display:none" class="pulse">●</span>
+    <span id="gps-ico" style="opacity:.4">📡</span>
+    <span style="font-size:12px" id="user-ico">👤</span>
+  </div>
+</div>
+
+<div id="screen">
+
+  <!-- DASHBOARD -->
+  <div id="page-dashboard" class="page active su">
+    <div style="padding-top:18px;margin-bottom:16px">
+      <div style="font-size:11px;color:rgba(255,255,255,.4);font-weight:700;letter-spacing:1px;text-transform:uppercase" id="date-lbl"></div>
+      <div style="font-family:'Bebas Neue';font-size:29px;letter-spacing:1px;margin-top:2px">
+        Bonjour, <span style="color:var(--g)" id="dash-name">–</span> 👋
+      </div>
+    </div>
+    <div class="card" style="display:flex;align-items:center;gap:16px;box-shadow:0 0 28px rgba(16,185,129,.15)">
+      <div class="ring-wrap" style="width:126px;height:126px">
+        <svg width="126" height="126" style="transform:rotate(-90deg);position:absolute">
+          <circle cx="63" cy="63" r="53" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="9"/>
+          <circle id="ring-c" cx="63" cy="63" r="53" fill="none" stroke="var(--g)" stroke-width="9"
+            stroke-linecap="round" stroke-dasharray="333" stroke-dashoffset="333"
+            style="transition:stroke-dashoffset .5s;filter:drop-shadow(0 0 6px var(--g))"/>
+        </svg>
+        <div class="ring-inner">
+          <div style="font-family:'Bebas Neue';font-size:24px;color:var(--g);line-height:1" id="ring-steps">0</div>
+          <div style="font-size:9px;color:rgba(255,255,255,.4);font-weight:700;text-transform:uppercase">pas</div>
+          <div style="font-size:10px;color:var(--g);font-weight:700;margin-top:1px" id="ring-pct">0%</div>
+        </div>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;gap:10px">
+        <div>
+          <div style="font-size:10px;color:rgba(255,255,255,.38);font-weight:700;text-transform:uppercase">Objectif</div>
+          <div style="font-family:'Bebas Neue';font-size:20px;letter-spacing:1px" id="goal-lbl">10 000 pas</div>
+        </div>
+        <div>
+          <div style="font-size:10px;color:rgba(255,255,255,.38);font-weight:700;text-transform:uppercase">Restants</div>
+          <div style="font-family:'Bebas Neue';font-size:20px;color:var(--y);letter-spacing:1px" id="remain-lbl">–</div>
+        </div>
+        <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+      </div>
+    </div>
+    <div class="sec">Aujourd'hui</div>
+    <div class="g2">
+      <div class="sc"><div style="font-size:17px">🔥</div><div class="sv" style="color:var(--o)" id="d-cals">0 <span style="font-size:12px;opacity:.6">kcal</span></div><div class="sl">Calories</div></div>
+      <div class="sc"><div style="font-size:17px">📍</div><div class="sv" style="color:var(--b)" id="d-dist">0.00 <span style="font-size:12px;opacity:.6">km</span></div><div class="sl">Distance</div></div>
+      <div class="sc"><div style="font-size:17px">⚡</div><div class="sv" style="color:var(--p)" id="d-spd">– <span style="font-size:12px;opacity:.6">km/h</span></div><div class="sl">Vitesse</div></div>
+      <div class="sc"><div style="font-size:17px">⏱</div><div class="sv" style="color:var(--g)" id="d-time">–</div><div class="sl">Actif</div></div>
+    </div>
+    <div class="sec">Semaine</div>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;margin-bottom:12px">
+        <div><div style="font-size:10px;color:rgba(255,255,255,.35);font-weight:700;text-transform:uppercase">Moy. quotidien</div>
+          <div style="font-family:'Bebas Neue';font-size:22px;letter-spacing:1px" id="avg-s">–</div></div>
+        <div style="text-align:right"><div style="font-size:10px;color:rgba(255,255,255,.35);font-weight:700;text-transform:uppercase">Dist. semaine</div>
+          <div style="font-family:'Bebas Neue';font-size:22px;color:var(--b);letter-spacing:1px" id="wk-dist">– km</div></div>
+      </div>
+      <div class="bar-chart" id="wk-chart"></div>
+    </div>
+    <div class="g3" style="margin-top:9px">
+      <div class="card" style="text-align:center;padding:12px"><div style="font-size:19px">🔥</div>
+        <div style="font-family:'Bebas Neue';font-size:20px;color:var(--o);margin-top:3px" id="wk-cals">0</div>
+        <div style="font-size:9px;color:rgba(255,255,255,.35);font-weight:700;text-transform:uppercase;margin-top:1px">Cal semaine</div></div>
+      <div class="card" style="text-align:center;padding:12px"><div style="font-size:19px">🏆</div>
+        <div style="font-family:'Bebas Neue';font-size:20px;color:var(--y);margin-top:3px" id="goals-met">0</div>
+        <div style="font-size:9px;color:rgba(255,255,255,.35);font-weight:700;text-transform:uppercase;margin-top:1px">Objectifs</div></div>
+      <div class="card" style="text-align:center;padding:12px"><div style="font-size:19px">📅</div>
+        <div style="font-family:'Bebas Neue';font-size:20px;color:var(--p);margin-top:3px" id="streak-cnt">0</div>
+        <div style="font-size:9px;color:rgba(255,255,255,.35);font-weight:700;text-transform:uppercase;margin-top:1px">Jours streak</div></div>
+    </div>
+    <div style="margin-top:14px">
+      <button class="big-btn" id="dash-btn" onclick="dashStart()"
+        style="background:linear-gradient(135deg,#10B981,#059669);color:#fff;box-shadow:0 4px 22px rgba(16,185,129,.38)">
+        ▶ Démarrer une activité
+      </button>
+    </div>
+  </div><!-- /dashboard -->
+
+  <!-- TRACK -->
+  <div id="page-track" class="page su">
+    <div style="padding-top:18px;margin-bottom:12px">
+      <div style="font-family:'Bebas Neue';font-size:26px;letter-spacing:1px" id="trk-title">Nouvelle activité</div>
+    </div>
+
+    <!-- Sensor status -->
+    <div id="sensor-status" style="margin-bottom:12px">
+      <div class="sensor-bar">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="sensor-dot" id="dot-gps"></div>
+          <span style="font-size:12px;font-weight:700">GPS</span>
+          <span style="font-size:11px;color:rgba(255,255,255,.4)" id="gps-label">En attente…</span>
+        </div>
+        <span style="font-size:10px;color:rgba(255,255,255,.35)" id="gps-acc"></span>
+      </div>
+      <div class="sensor-bar">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="sensor-dot" id="dot-acc"></div>
+          <span style="font-size:12px;font-weight:700">Accéléromètre</span>
+          <span style="font-size:11px;color:rgba(255,255,255,.4)" id="acc-label">En attente…</span>
+        </div>
+        <span style="font-size:10px;color:var(--g)" id="acc-steps-preview"></span>
+      </div>
+    </div>
+
+    <!-- Activity selector -->
+    <div id="act-selector">
+      <div class="sec" style="margin-top:4px">Choisir l'activité</div>
+      <div class="g2" id="act-grid"></div>
+    </div>
+
+    <!-- Live session (generic) -->
+    <div id="live-generic" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <span class="badge" id="act-badge">🚶 Marche</span>
+        <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--g);font-weight:700" id="live-ind">
+          <span class="pulse" style="font-size:7px">●</span>EN DIRECT
+        </div>
+      </div>
+      <div class="card" style="text-align:center;margin-bottom:12px;background:rgba(255,255,255,.04)">
+        <div style="font-family:'Bebas Neue';font-size:50px;letter-spacing:4px;line-height:1;transition:color .3s" id="timer">00:00:00</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.35);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-top:2px">Durée</div>
+      </div>
+      <div class="g2" style="margin-bottom:12px">
+        <div class="sc"><div style="font-size:17px">👣</div><div class="sv" style="color:var(--g)" id="l-steps">0</div><div class="sl">Pas</div></div>
+        <div class="sc"><div style="font-size:17px">📍</div><div class="sv" style="color:var(--b)" id="l-dist">0.00 <span style="font-size:11px;opacity:.6">km</span></div><div class="sl">Distance</div></div>
+        <div class="sc"><div style="font-size:17px">🔥</div><div class="sv" style="color:var(--o)" id="l-cals">0 <span style="font-size:11px;opacity:.6">kcal</span></div><div class="sl">Calories</div></div>
+        <div class="sc"><div style="font-size:17px">⚡</div><div class="sv" style="color:var(--p)" id="l-spd">0.0 <span style="font-size:11px;opacity:.6">km/h</span></div><div class="sl">Vitesse</div></div>
+      </div>
+      <div class="card" style="display:flex;justify-content:space-around;align-items:center;margin-bottom:12px;padding:10px 16px">
+        <div style="text-align:center"><div style="font-family:'Bebas Neue';font-size:21px;color:var(--y)" id="l-pace">–</div>
+          <div style="font-size:9px;color:rgba(255,255,255,.35);font-weight:700;text-transform:uppercase">Allure /km</div></div>
+        <div class="divider"></div>
+        <div style="text-align:center"><div style="font-family:'Bebas Neue';font-size:21px;color:var(--g)" id="l-spm">0</div>
+          <div style="font-size:9px;color:rgba(255,255,255,.35);font-weight:700;text-transform:uppercase">Pas/min</div></div>
+        <div class="divider"></div>
+        <div style="text-align:center"><div style="font-family:'Bebas Neue';font-size:21px;color:var(--p)" id="l-gpct">0%</div>
+          <div style="font-size:9px;color:rgba(255,255,255,.35);font-weight:700;text-transform:uppercase">Objectif</div></div>
+      </div>
+    </div>
+
+    <!-- CYCLING LIVE PANEL -->
+    <div id="live-cycling" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <span class="badge" style="background:rgba(6,182,212,.15);border:1px solid var(--cy);color:var(--cy)">🚴 Vélo</span>
+        <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--cy);font-weight:700" id="cy-live-ind">
+          <span class="pulse" style="font-size:7px">●</span>EN DIRECT
+        </div>
+      </div>
+      <!-- Timer cycling -->
+      <div class="card" style="text-align:center;margin-bottom:12px;background:rgba(6,182,212,.06);border-color:rgba(6,182,212,.15)">
+        <div style="font-family:'Bebas Neue';font-size:50px;letter-spacing:4px;line-height:1;color:var(--cy)" id="cy-timer">00:00:00</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.35);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-top:2px">Durée session</div>
+      </div>
+      <!-- Power hero -->
+      <div class="cy-power" style="margin-bottom:12px">
+        <div style="font-size:11px;color:rgba(255,255,255,.4);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Puissance estimée</div>
+        <div style="font-family:'Bebas Neue';font-size:52px;color:var(--y);letter-spacing:2px;line-height:1" id="cy-power">0</div>
+        <div style="font-size:13px;color:rgba(245,158,11,.7);font-weight:700">watts</div>
+        <div style="margin-top:8px;height:4px;background:rgba(255,255,255,.1);border-radius:4px;overflow:hidden">
+          <div id="cy-power-bar" style="height:100%;background:linear-gradient(90deg,var(--g),var(--y),var(--r));border-radius:4px;transition:width .5s;width:0%"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:3px">
+          <span style="font-size:9px;color:rgba(255,255,255,.3);font-weight:700">0W</span>
+          <span style="font-size:9px;color:rgba(255,255,255,.3);font-weight:700" id="cy-zone">Zone –</span>
+          <span style="font-size:9px;color:rgba(255,255,255,.3);font-weight:700">400W</span>
+        </div>
+      </div>
+      <!-- Cycling stats grid -->
+      <div class="g2" style="margin-bottom:12px">
+        <div class="sc"><div style="font-size:17px">⚡</div><div class="sv" style="color:var(--cy)" id="cy-spd">0.0 <span style="font-size:11px;opacity:.6">km/h</span></div><div class="sl">Vitesse</div></div>
+        <div class="sc"><div style="font-size:17px">🔄</div><div class="sv" style="color:var(--p)" id="cy-cad">– <span style="font-size:11px;opacity:.6">rpm</span></div><div class="sl">Cadence</div></div>
+        <div class="sc"><div style="font-size:17px">📍</div><div class="sv" style="color:var(--b)" id="cy-dist">0.00 <span style="font-size:11px;opacity:.6">km</span></div><div class="sl">Distance</div></div>
+        <div class="sc"><div style="font-size:17px">🔥</div><div class="sv" style="color:var(--o)" id="cy-cals">0 <span style="font-size:11px;opacity:.6">kcal</span></div><div class="sl">Calories</div></div>
+      </div>
+      <!-- Max / Avg / Elevation -->
+      <div class="card" style="margin-bottom:12px;padding:12px 16px">
+        <div style="display:flex;justify-content:space-around">
+          <div style="text-align:center"><div style="font-family:'Bebas Neue';font-size:20px;color:var(--r)" id="cy-maxspd">0</div>
+            <div style="font-size:9px;color:rgba(255,255,255,.35);font-weight:700;text-transform:uppercase">Vmax km/h</div></div>
+          <div class="divider"></div>
+          <div style="text-align:center"><div style="font-family:'Bebas Neue';font-size:20px;color:var(--g)" id="cy-avgspd">0</div>
+            <div style="font-size:9px;color:rgba(255,255,255,.35);font-weight:700;text-transform:uppercase">Vmoy km/h</div></div>
+          <div class="divider"></div>
+          <div style="text-align:center"><div style="font-family:'Bebas Neue';font-size:20px;color:var(--b)" id="cy-elev">0</div>
+            <div style="font-size:9px;color:rgba(255,255,255,.35);font-weight:700;text-transform:uppercase">Dénivelé m</div></div>
+          <div class="divider"></div>
+          <div style="text-align:center"><div style="font-family:'Bebas Neue';font-size:20px;color:var(--y)" id="cy-avgpow">0</div>
+            <div style="font-size:9px;color:rgba(255,255,255,.35);font-weight:700;text-transform:uppercase">W moy</div></div>
+        </div>
+      </div>
+      <!-- Segments -->
+      <div class="sec" style="margin-top:4px">Segments kilométriques</div>
+      <div id="cy-segs"><div style="font-size:12px;color:rgba(255,255,255,.3);font-weight:600;padding:8px 0">Les segments apparaîtront tous les 1 km…</div></div>
+    </div>
+
+    <!-- GPS MAP (shared) -->
+    <div id="map-section" style="display:none">
+      <div class="sec" style="margin-top:4px">Parcours GPS</div>
+      <div class="card" style="padding:7px;height:185px;margin-bottom:12px" id="map-box">
+        <div id="map-ph" style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px">
+          <div style="font-size:28px">📡</div>
+          <div style="font-size:12px;color:rgba(255,255,255,.4);font-weight:600;text-align:center" id="map-ph-txt">
+            Démarrer pour activer le GPS<br><span style="font-size:10px;opacity:.6">Position en temps réel</span>
+          </div>
+          <div style="font-size:11px;color:var(--g);font-weight:700;display:none" id="gps-coords"></div>
+        </div>
+        <canvas id="route-canvas" style="display:none"></canvas>
+      </div>
+    </div>
+
+    <!-- Controls -->
+    <div id="ctrl-start">
+      <button class="big-btn" onclick="startActivity()"
+        style="background:linear-gradient(135deg,#10B981,#059669);color:#fff;box-shadow:0 4px 22px rgba(16,185,129,.4)">
+        ▶ Démarrer
+      </button>
+    </div>
+    <div id="ctrl-session" style="display:none;flex-direction:column;gap:8px">
+      <div style="display:flex;gap:8px">
+        <button class="big-btn" id="pause-btn" onclick="togglePause()"
+          style="flex:1;background:rgba(245,158,11,.14);border:1.5px solid var(--y);color:var(--y)">
+          ⏸ Pause
+        </button>
+        <button class="big-btn" onclick="stopActivity()"
+          style="flex:1;background:rgba(239,68,68,.14);border:1.5px solid var(--r);color:var(--r)">
+          ⏹ Arrêter
+        </button>
+      </div>
+    </div>
+  </div><!-- /track -->
+
+  <!-- STATS -->
+  <div id="page-stats" class="page su">
+    <div style="padding-top:18px;margin-bottom:12px"><div style="font-family:'Bebas Neue';font-size:26px;letter-spacing:1px">Statistiques</div></div>
+    <div style="display:flex;gap:8px;margin-bottom:16px">
+      <button onclick="setPeriod('week')" id="btn-wk" style="padding:7px 18px;border-radius:20px;border:none;cursor:pointer;font-family:Barlow;font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.5px;background:var(--g);color:#fff;transition:all .2s">Semaine</button>
+      <button onclick="setPeriod('month')" id="btn-mo" style="padding:7px 18px;border-radius:20px;border:none;cursor:pointer;font-family:Barlow;font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.5px;background:rgba(255,255,255,.07);color:rgba(255,255,255,.45);transition:all .2s">Mois</button>
+    </div>
+    <div class="g3" id="st-summary" style="margin-bottom:16px"></div>
+    <div class="sec">Évolution des pas</div>
+    <div class="card" style="padding:14px 14px 10px">
+      <svg id="steps-svg" viewBox="0 0 320 85" style="width:100%;height:85px" preserveAspectRatio="none"></svg>
+      <div style="display:flex;gap:5px;margin-top:6px" id="steps-xlbl"></div>
+    </div>
+    <div class="sec">Calories brûlées</div>
+    <div class="card" style="padding:14px 14px 10px">
+      <div class="bar-chart" id="cals-chart" style="height:75px"></div>
+    </div>
+    <div class="sec">Activités — répartition</div>
+    <div id="act-breakdown"></div>
+  </div>
+
+  <!-- HISTORY -->
+  <div id="page-history" class="page su">
+    <div style="padding-top:18px;margin-bottom:16px">
+      <div style="font-family:'Bebas Neue';font-size:26px;letter-spacing:1px">Historique</div>
+      <div style="font-size:12px;color:rgba(255,255,255,.4);font-weight:600;margin-top:2px" id="hist-cnt"></div>
+    </div>
+    <div id="hist-list"></div>
+  </div>
+
+  <!-- PROFILE -->
+  <div id="page-profile" class="page su">
+    <div style="padding-top:18px;margin-bottom:16px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div style="font-family:'Bebas Neue';font-size:26px;letter-spacing:1px">Profil</div>
+        <button onclick="doLogout()" style="padding:6px 14px;border-radius:20px;border:1px solid rgba(239,68,68,.4);background:rgba(239,68,68,.1);color:var(--r);font-family:Barlow;font-weight:700;font-size:11px;text-transform:uppercase;cursor:pointer">Déconnexion</button>
+      </div>
+    </div>
+    <div class="card" style="display:flex;align-items:center;gap:14px;margin-bottom:14px">
+      <div id="av-ico" style="width:56px;height:56px;border-radius:17px;background:linear-gradient(135deg,#10B981,#3B82F6);display:flex;align-items:center;justify-content:center;font-size:25px;flex-shrink:0">🧑‍🦱</div>
+      <div style="flex:1">
+        <input id="pr-name" value="" oninput="saveProfile('name',this.value)"
+          style="background:none;border:none;color:#fff;font-family:'Bebas Neue';font-size:21px;letter-spacing:1px;width:100%;outline:none"/>
+        <div style="font-size:11px;color:rgba(255,255,255,.4);font-weight:600" id="pr-sub">–</div>
+      </div>
+    </div>
+    <div class="card" style="display:flex;align-items:center;gap:14px;margin-bottom:12px" id="bmi-card">
+      <div id="bmi-ico" style="width:50px;height:50px;border-radius:13px;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0">
+        <div id="bmi-v" style="font-family:'Bebas Neue';font-size:18px;line-height:1"></div>
+        <div style="font-size:8px;font-weight:700;text-transform:uppercase">IMC</div>
+      </div>
+      <div><div id="bmi-lbl" style="font-weight:700;font-size:15px"></div>
+        <div style="font-size:11px;color:rgba(255,255,255,.4);font-weight:600">Indice de masse corporelle</div></div>
+    </div>
+    <div class="sec">Objectif quotidien</div>
+    <div class="card" style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <span style="font-family:'Barlow Condensed';font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.5px">Pas/jour</span>
+        <span style="font-family:'Bebas Neue';font-size:20px;color:var(--g)" id="goal-disp">10 000</span>
+      </div>
+      <input type="range" id="goal-sl" min="3000" max="20000" step="500" value="10000"
+        oninput="document.getElementById('goal-disp').textContent=Number(this.value).toLocaleString()"
+        onchange="saveProfile('stepGoal',+this.value)"/>
+      <div style="display:flex;justify-content:space-between;margin-top:5px">
+        <span style="font-size:10px;color:rgba(255,255,255,.25);font-weight:600">3 000</span>
+        <span style="font-size:10px;color:rgba(255,255,255,.25);font-weight:600">20 000</span>
+      </div>
+    </div>
+    <div class="sec">Données corporelles</div>
+    <div class="card" style="display:flex;flex-direction:column;gap:13px;margin-bottom:12px">
+      <div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+          <span style="font-family:'Barlow Condensed';font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.5px">Poids (kg)</span>
+          <span style="font-family:'Bebas Neue';font-size:18px;color:var(--o)" id="pr-wt">70</span>
+        </div>
+        <input type="range" min="30" max="200" value="70" id="sl-wt"
+          oninput="document.getElementById('pr-wt').textContent=this.value;saveProfile('weight',+this.value)"/>
+      </div>
+      <div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+          <span style="font-family:'Barlow Condensed';font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.5px">Taille (cm)</span>
+          <span style="font-family:'Bebas Neue';font-size:18px;color:var(--b)" id="pr-ht">175</span>
+        </div>
+        <input type="range" min="100" max="230" value="175" id="sl-ht"
+          oninput="document.getElementById('pr-ht').textContent=this.value;saveProfile('height',+this.value)"/>
+      </div>
+      <div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+          <span style="font-family:'Barlow Condensed';font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.5px">Âge (ans)</span>
+          <span style="font-family:'Bebas Neue';font-size:18px;color:var(--p)" id="pr-age">30</span>
+        </div>
+        <input type="range" min="5" max="100" value="30" id="sl-age"
+          oninput="document.getElementById('pr-age').textContent=this.value;saveProfile('age',+this.value)"/>
+      </div>
+      <div>
+        <div style="font-family:'Barlow Condensed';font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px">Genre</div>
+        <div style="display:flex;gap:8px">
+          <button id="btn-m" onclick="setGender('male')"
+            style="flex:1;padding:9px;border-radius:11px;border:1.5px solid var(--g);background:rgba(16,185,129,.14);color:var(--g);font-family:'Barlow Condensed';font-weight:700;font-size:13px;text-transform:uppercase;cursor:pointer;transition:all .2s">🧑‍🦱 Homme</button>
+          <button id="btn-f" onclick="setGender('female')"
+            style="flex:1;padding:9px;border-radius:11px;border:1.5px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:rgba(255,255,255,.45);font-family:'Barlow Condensed';font-weight:700;font-size:13px;text-transform:uppercase;cursor:pointer;transition:all .2s">👩 Femme</button>
+        </div>
+      </div>
+    </div>
+    <div class="sec">Succès & Badges</div>
+    <div class="g3" id="achievements"></div>
+  </div>
+
+</div><!-- /screen -->
+
+<!-- NAV -->
+<nav id="nav">
+  <button class="nb on" id="nav-dashboard" onclick="goTab('dashboard')"><span class="ni">🏠</span><span class="nl">Accueil</span></button>
+  <button class="nb" id="nav-track"     onclick="goTab('track')"><span class="ni">▶</span><span class="nl">Activité</span></button>
+  <button class="nb" id="nav-stats"     onclick="goTab('stats')"><span class="ni">📊</span><span class="nl">Stats</span></button>
+  <button class="nb" id="nav-history"   onclick="goTab('history')"><span class="ni">📋</span><span class="nl">Historique</span></button>
+  <button class="nb" id="nav-profile"   onclick="goTab('profile')"><span class="ni">👤</span><span class="nl">Profil</span></button>
+</nav>
+
+</div><!-- /app -->
+
+<script>
+// ═══════════════════════════════════════════════════
+//  ACTIVITY DEFINITIONS
+// ═══════════════════════════════════════════════════
+const ACTS={
+  walking: {label:'Marche',       icon:'🚶',  color:'#F59E0B',rgb:'245,158,11',  spd:[0.5,4],  cal:0.57,mets:3.5},
+  fastWalk:{label:'Marche rapide',icon:'🚶‍♂️', color:'#F97316',rgb:'249,115,22',  spd:[4,7],    cal:0.72,mets:5.0},
+  running: {label:'Course',       icon:'🏃',  color:'#10B981',rgb:'16,185,129',  spd:[7,20],   cal:1.0, mets:9.8},
+  cycling: {label:'Vélo',         icon:'🚴',  color:'#06B6D4',rgb:'6,182,212',   spd:[5,999],  cal:0.0, mets:7.5},
+};
+
+// ═══════════════════════════════════════════════════
+//  LOCAL STORAGE HELPERS
+// ═══════════════════════════════════════════════════
+const LS={
+  get:(k,def)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):def}catch(e){return def}},
+  set:(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}},
+  rm:(k)=>{try{localStorage.removeItem(k)}catch(e){}}
+};
+
+// ═══════════════════════════════════════════════════
+//  AUTH
+// ═══════════════════════════════════════════════════
+let currentUser=null;
+
+function simpleHash(str){
+  let h=0;
+  for(let i=0;i<str.length;i++){h=(Math.imul(31,h)+str.charCodeAt(i))|0;}
+  return h.toString(36);
+}
+
+function switchAuth(tab){
+  document.getElementById('tab-login').classList.toggle('active',tab==='login');
+  document.getElementById('tab-signup').classList.toggle('active',tab==='signup');
+  document.getElementById('form-login').style.display=tab==='login'?'block':'none';
+  document.getElementById('form-signup').style.display=tab==='signup'?'block':'none';
+}
+
+function doLogin(){
+  const email=document.getElementById('li-email').value.trim().toLowerCase();
+  const pwd=document.getElementById('li-pwd').value;
+  const errEl=document.getElementById('err-login');
+  errEl.style.display='none';
+  if(!email||!pwd){showAuthErr(errEl,'Veuillez remplir tous les champs.');return;}
+  const users=LS.get('ft_users',{});
+  // seed demo account
+  if(!users['demo@fit.com']){
+    users['demo@fit.com']={hash:simpleHash('demo123'),name:'Demo',email:'demo@fit.com',weight:70,height:175,age:28,gender:'male',stepGoal:10000};
+    LS.set('ft_users',users);
+  }
+  const u=users[email];
+  if(!u||u.hash!==simpleHash(pwd)){showAuthErr(errEl,'Email ou mot de passe incorrect.');return;}
+  loginSuccess(u);
+}
+
+function doSignup(){
+  const name=document.getElementById('su-name').value.trim();
+  const email=document.getElementById('su-email').value.trim().toLowerCase();
+  const pwd=document.getElementById('su-pwd').value;
+  const weight=parseInt(document.getElementById('su-weight').value)||70;
+  const errEl=document.getElementById('err-signup');
+  errEl.style.display='none';
+  if(!name||!email||!pwd){showAuthErr(errEl,'Veuillez remplir tous les champs.');return;}
+  if(pwd.length<6){showAuthErr(errEl,'Mot de passe trop court (6 car. min).');return;}
+  if(!/\S+@\S+\.\S+/.test(email)){showAuthErr(errEl,'Email invalide.');return;}
+  const users=LS.get('ft_users',{});
+  if(users[email]){showAuthErr(errEl,'Cet email est déjà utilisé.');return;}
+  const u={hash:simpleHash(pwd),name,email,weight,height:175,age:30,gender:'male',stepGoal:10000};
+  users[email]=u;
+  LS.set('ft_users',users);
+  loginSuccess(u);
+}
+
+function showAuthErr(el,msg){el.textContent=msg;el.style.display='block';}
+
+function loginSuccess(u){
+  currentUser=u;
+  LS.set('ft_current',u.email);
+  document.getElementById('auth-wrap').style.display='none';
+  document.getElementById('user-ico').textContent='👤';
+  initApp();
+}
+
+function doLogout(){
+  stopActivity();
+  currentUser=null;
+  LS.rm('ft_current');
+  document.getElementById('auth-wrap').style.display='flex';
+  document.getElementById('li-pwd').value='';
+}
+
+// Check auto-login
+(function(){
+  const saved=LS.get('ft_current',null);
+  if(saved){
+    const users=LS.get('ft_users',{});
+    // seed demo
+    if(!users['demo@fit.com']){
+      users['demo@fit.com']={hash:simpleHash('demo123'),name:'Demo',email:'demo@fit.com',weight:70,height:175,age:28,gender:'male',stepGoal:10000};
+      LS.set('ft_users',users);
+    }
+    if(users[saved]){currentUser=users[saved];document.getElementById('auth-wrap').style.display='none';initApp();}
+  }
+})();
+
+// ═══════════════════════════════════════════════════
+//  SESSION STATE
+// ═══════════════════════════════════════════════════
+let S={
+  isTracking:false,isPaused:false,
+  actKey:'walking',
+  elapsed:0,steps:0,dist:0,speed:0,
+  gpsRoute:[],gpsLoc:null,gpsAlt:null,gpsMinAlt:null,gpsMaxAlt:null,
+  maxSpeed:0,speedSum:0,speedCount:0,
+  powSum:0,powCount:0,
+  cySegDist:0,cySegs:[],
+  cadBuf:[],cadRPM:0,
+  totalStepsToday:0,
+  history:[],
+};
+
+// ═══════════════════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════════════════
+function fmtT(s){return String(Math.floor(s/3600)).padStart(2,'0')+':'+String(Math.floor((s%3600)/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')}
+function haversine(a,b){const R=6371,dLat=(b.lat-a.lat)*Math.PI/180,dLon=(b.lng-a.lng)*Math.PI/180;const x=Math.sin(dLat/2)**2+Math.cos(a.lat*Math.PI/180)*Math.cos(b.lat*Math.PI/180)*Math.sin(dLon/2)**2;return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x))}
+function genHistory(){
+  const days=['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+  const keys=Object.keys(ACTS);
+  return days.map(d=>({day:d,steps:Math.floor(5000+Math.random()*7000),distance:+(1.5+Math.random()*7).toFixed(2),calories:Math.floor(150+Math.random()*500),duration:Math.floor(15+Math.random()*80),activity:keys[Math.floor(Math.random()*keys.length)]}));
+}
+function h2r(hex){const r=/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);return r?`${parseInt(r[1],16)},${parseInt(r[2],16)},${parseInt(r[3],16)}`:'255,255,255'}
+function $i(id){return document.getElementById(id)}
+function setH(id,v){const e=$i(id);if(e)e.innerHTML=v}
+function setT(id,v){const e=$i(id);if(e)e.textContent=v}
+
+// ═══════════════════════════════════════════════════
+//  STEP COUNTER — REAL ALGORITHM
+//  Low-pass gravity filter + peak detection + debounce
+// ═══════════════════════════════════════════════════
+let gx=0,gy=0,gz=0;          // gravity components (low-pass)
+const ALPHA=0.8;              // low-pass alpha
+const STEP_TH=2.2;            // linear acc magnitude threshold (m/s²)
+const MIN_STEP_MS=250;        // debounce: min 250ms between steps
+let lastStepTime=0;
+let magBuf=[];                // buffer for smoothing
+const MAG_WIN=4;              // moving avg window
+let sensorActive=false;
+
+function onMotion(e){
+  const acc=e.accelerationIncludingGravity;
+  if(!acc)return;
+  sensorActive=true;
+  setDot('dot-acc',true);
+  setT('acc-label','Actif');
+
+  // Low-pass filter → gravity estimate
+  gx=ALPHA*gx+(1-ALPHA)*(acc.x||0);
+  gy=ALPHA*gy+(1-ALPHA)*(acc.y||0);
+  gz=ALPHA*gz+(1-ALPHA)*(acc.z||0);
+
+  // Linear acceleration (remove gravity)
+  const lx=(acc.x||0)-gx,ly=(acc.y||0)-gy,lz=(acc.z||0)-gz;
+  const mag=Math.sqrt(lx*lx+ly*ly+lz*lz);
+
+  // Moving average smoothing
+  magBuf.push(mag);
+  if(magBuf.length>MAG_WIN)magBuf.shift();
+  const smooth=magBuf.reduce((a,b)=>a+b,0)/magBuf.length;
+
+  if(!S.isTracking||S.isPaused)return;
+
+  // Peak detection with debounce
+  const now=Date.now();
+  if(smooth>STEP_TH&&(now-lastStepTime)>MIN_STEP_MS){
+    S.steps++;
+    lastStepTime=now;
+    setT('acc-steps-preview',S.steps+' pas');
+  }
+
+  // Cadence detection for cycling (count peaks per 3s window)
+  if(S.actKey==='cycling'){
+    S.cadBuf.push({t:now,v:smooth});
+    // Keep only last 4 seconds
+    S.cadBuf=S.cadBuf.filter(p=>now-p.t<4000);
+    // Count peaks
+    let peaks=0;
+    for(let i=1;i<S.cadBuf.length-1;i++){
+      if(S.cadBuf[i].v>S.cadBuf[i-1].v&&S.cadBuf[i].v>S.cadBuf[i+1].v&&S.cadBuf[i].v>1.5)peaks++;
+    }
+    // peaks per 4 seconds → multiply by 15 to get RPM (60/4)
+    const rawRPM=peaks*15;
+    S.cadRPM=rawRPM>0?Math.round(rawRPM):S.cadRPM;
+  }
+}
+window.addEventListener('devicemotion',onMotion);
+
+// iOS permission
+function reqMotionPerm(){
+  if(typeof DeviceMotionEvent!=='undefined'&&typeof DeviceMotionEvent.requestPermission==='function'){
+    DeviceMotionEvent.requestPermission().then(r=>{
+      setT('acc-label',r==='granted'?'Autorisé':'Refusé');
+    }).catch(()=>{});
+  }
+}
+
+// ═══════════════════════════════════════════════════
+//  GPS TRACKER
+// ═══════════════════════════════════════════════════
+let gpsWid=null,lastGPSPt=null,gpsReady=false;
+
+function startGPS(){
+  if(!navigator.geolocation){setT('gps-label','Non disponible');return;}
+  setT('gps-label','Acquisition…');
+  gpsWid=navigator.geolocation.watchPosition(onGPS,onGPSErr,
+    {enableHighAccuracy:true,maximumAge:1000,timeout:15000});
+}
+function stopGPS(){if(gpsWid!==null){navigator.geolocation.clearWatch(gpsWid);gpsWid=null;gpsReady=false;}}
+
+function onGPS(pos){
+  const {latitude:lat,longitude:lng,speed,accuracy,altitude}=pos.coords;
+  const pt={lat,lng};
+  gpsReady=true;
+  setDot('gps-ico-top',true);
+  setDot('dot-gps',true);
+  setT('gps-label','Actif');
+  setT('gps-acc',accuracy?Math.round(accuracy)+'m':'');
+  $i('gps-ico').style.opacity='1';
+
+  const coordTxt='📍 '+lat.toFixed(5)+', '+lng.toFixed(5);
+  setT('gps-coords',coordTxt);
+  $i('gps-coords').style.display='block';
+  setT('map-ph-txt','Signal GPS actif<br><span style="font-size:10px;opacity:.6">'+coordTxt+'</span>');
+
+  if(!S.isTracking||S.isPaused)return;
+
+  S.gpsLoc=pt;
+  S.gpsRoute.push({...pt,t:Date.now()});
+
+  // Speed from GPS
+  const gpsSpd=speed?speed*3.6:0;
+  if(gpsSpd>0.5)S.speed=gpsSpd;
+
+  // Distance
+  if(lastGPSPt){const d=haversine(lastGPSPt,pt);S.dist+=d;}
+  lastGPSPt=pt;
+
+  // Elevation
+  if(altitude!==null&&altitude!==undefined){
+    if(S.gpsMinAlt===null)S.gpsMinAlt=altitude;
+    if(S.gpsMaxAlt===null)S.gpsMaxAlt=altitude;
+    S.gpsMinAlt=Math.min(S.gpsMinAlt,altitude);
+    S.gpsMaxAlt=Math.max(S.gpsMaxAlt,altitude);
+    S.gpsAlt=altitude;
+  }
+
+  // Cycling segment every 1km
+  if(S.actKey==='cycling'&&lastGPSPt){
+    S.cySegDist+=haversine(lastGPSPt,pt);
+    if(S.cySegDist>=1.0){
+      S.cySegs.push({km:S.cySegs.length+1,spd:S.speed.toFixed(1),time:fmtT(S.elapsed)});
+      S.cySegDist=0;
+      renderCySegs();
+    }
+  }
+
+  drawRoute();
+}
+function onGPSErr(err){
+  setT('gps-label',err.code===1?'Accès refusé':err.code===2?'Indisponible':'Timeout');
+  setDot('dot-gps',false);
+}
+
+// GPS dot in statusbar
+function setDot(id,on){const e=$i(id);if(e){e.classList.toggle('on',on);e.classList.toggle('off',!on);}}
+
+// ═══════════════════════════════════════════════════
+//  CYCLING POWER CALCULATION
+//  P = (F_roll + F_aero) × v
+//  F_roll = Crr × m × g    (rolling resistance)
+//  F_aero = 0.5×Cd×A×ρ×v² (aerodynamic drag)
+// ═══════════════════════════════════════════════════
+function calcPower(speedMs,weight){
+  const Crr=0.004,g=9.81,Cd=0.7,A=0.5,rho=1.2;
+  const Froll=Crr*weight*g;
+  const Faero=0.5*Cd*A*rho*speedMs*speedMs;
+  return Math.max(0,Math.round((Froll+Faero)*speedMs));
+}
+function powerZone(watts,weight){
+  // Approximate zones based on W/kg (assuming FTP ≈ 3.5 W/kg)
+  const ftp=weight*3.5;
+  const pct=watts/ftp*100;
+  if(pct<56)return'Zone 1 — Récup';
+  if(pct<76)return'Zone 2 — Endurance';
+  if(pct<91)return'Zone 3 — Tempo';
+  if(pct<106)return'Zone 4 — Seuil';
+  if(pct<121)return'Zone 5 — VO2max';
+  return'Zone 6 — Anaérobie';
+}
+
+// ═══════════════════════════════════════════════════
+//  CALORIES
+// ═══════════════════════════════════════════════════
+function calcCals(actKey,dist,durationSec,weight){
+  if(actKey==='cycling'){
+    // MET-based: Cal = MET × weight(kg) × time(h)
+    const hrs=durationSec/3600;
+    return Math.round(ACTS.cycling.mets*weight*hrs);
+  }
+  const cal=ACTS[actKey]?.cal||0;
+  return Math.round(dist*weight*cal);
+}
+
+// ═══════════════════════════════════════════════════
+//  TIMER & SIMULATION
+// ═══════════════════════════════════════════════════
+let timerIv=null,simIv=null;
+
+function startTimer(){
+  stopTimer();
+  timerIv=setInterval(()=>{
+    if(S.isPaused)return;
+    S.elapsed++;
+    if(S.speed>0){S.speedSum+=S.speed;S.speedCount++;}
+    if(S.speed>S.maxSpeed)S.maxSpeed=S.speed;
+    updateLiveUI();
+  },1000);
+}
+function stopTimer(){if(timerIv){clearInterval(timerIv);timerIv=null;}}
+
+// Simulation when no real sensors
+function startSim(){
+  stopSim();
+  let simSpd=S.actKey==='cycling'?22:5.5;
+  simIv=setInterval(()=>{
+    if(!S.isTracking||S.isPaused)return;
+    // Drift speed
+    simSpd=Math.max(0.5,Math.min(S.actKey==='cycling'?45:18,simSpd+(Math.random()-.45)*.8));
+    if(S.speed<0.5)S.speed=simSpd;
+    // Simulate GPS distance
+    const dkm=(simSpd/3600)*1;// 1 second → km
+    S.dist+=dkm;
+    // Simulate steps (only for non-cycling)
+    if(S.actKey!=='cycling'&&S.steps<1){
+      S.steps+=Math.floor(1+Math.random()*2);
+    }
+    // Cycling cadence simulation
+    if(S.actKey==='cycling'){
+      S.cadRPM=Math.round(75+Math.random()*20);
+    }
+  },1000);
+}
+function stopSim(){if(simIv){clearInterval(simIv);simIv=null;}}
+
+// ═══════════════════════════════════════════════════
+//  ACTIVITY CONTROLS
+// ═══════════════════════════════════════════════════
+function startActivity(){
+  S.isTracking=true;S.isPaused=false;
+  S.elapsed=0;S.steps=0;S.dist=0;S.speed=0;
+  S.gpsRoute=[];S.gpsLoc=null;S.gpsAlt=null;S.gpsMinAlt=null;S.gpsMaxAlt=null;
+  S.maxSpeed=0;S.speedSum=0;S.speedCount=0;S.powSum=0;S.powCount=0;
+  S.cySegDist=0;S.cySegs=[];S.cadBuf=[];S.cadRPM=0;
+  lastGPSPt=null;magBuf=[];
+
+  $i('trk-dot').style.display='inline';
+  reqMotionPerm();
+  startGPS();
+  startTimer();
+  startSim();
+  renderTrack();
+}
+
+function togglePause(){
+  S.isPaused=!S.isPaused;
+  const btn=$i('pause-btn');
+  if(btn)btn.innerHTML=S.isPaused?'▶ Reprendre':'⏸ Pause';
+  [$i('live-ind'),$i('cy-live-ind')].forEach(el=>{if(el)el.style.display=S.isPaused?'none':'flex';});
+}
+
+function stopActivity(){
+  stopTimer();stopSim();stopGPS();
+  if(!S.isTracking)return;
+  const effectiveDist=S.dist>0.01?S.dist:(S.actKey!=='cycling'?S.steps*0.00075:0);
+  const entry={
+    day:new Date().toLocaleDateString('fr-FR',{weekday:'short'}),
+    date:new Date().toLocaleDateString('fr-FR'),
+    steps:S.steps,
+    distance:+effectiveDist.toFixed(2),
+    calories:calcCals(S.actKey,effectiveDist,S.elapsed,getProfile().weight),
+    duration:S.elapsed,
+    activity:S.actKey,
+    maxSpeed:+S.maxSpeed.toFixed(1),
+    avgSpeed:S.speedCount>0?+(S.speedSum/S.speedCount).toFixed(1):0,
+    avgPow:S.actKey==='cycling'&&S.powCount>0?Math.round(S.powSum/S.powCount):null,
+    elevGain:S.gpsMinAlt!==null&&S.gpsMaxAlt!==null?Math.round(S.gpsMaxAlt-S.gpsMinAlt):null,
+  };
+  S.history.unshift(entry);
+  S.totalStepsToday+=S.steps;
+  saveHistory();
+  S.isTracking=false;S.isPaused=false;
+  $i('trk-dot').style.display='none';
+  setT('acc-steps-preview','');
+  renderTrack();
+  renderDashboard();
+}
+
+function dashStart(){goTab('track');startActivity();}
+
+// ═══════════════════════════════════════════════════
+//  LIVE UI UPDATE
+// ═══════════════════════════════════════════════════
+function updateLiveUI(){
+  if(!S.isTracking)return;
+  const weight=getProfile().weight;
+  const goal=getProfile().stepGoal;
+  const dist=S.dist>0.01?S.dist:(S.actKey!=='cycling'?S.steps*0.00075:0);
+  const cals=calcCals(S.actKey,dist,S.elapsed,weight);
+  const pace=S.speed>0.5?(60/S.speed).toFixed(1):'–';
+  const spm=Math.round(S.steps/Math.max(S.elapsed/60,.1));
+  const todayTotal=S.totalStepsToday+S.steps;
+  const gpct=Math.min(todayTotal/goal,1);
+
+  if(S.actKey==='cycling'){
+    const spdMs=S.speed/3.6;
+    const pow=calcPower(spdMs,weight);
+    S.powSum+=pow;S.powCount++;
+    const avgPow=Math.round(S.powSum/S.powCount);
+    const powPct=Math.min(pow/400*100,100);
+    const elevGain=S.gpsMinAlt!==null&&S.gpsMaxAlt!==null?Math.round(S.gpsMaxAlt-S.gpsMinAlt):0;
+    const avgSpd=S.speedCount>0?(S.speedSum/S.speedCount).toFixed(1):0;
+
+    setH('cy-timer',fmtT(S.elapsed));
+    setH('cy-power',pow);setH('cy-zone',powerZone(pow,weight));
+    $i('cy-power-bar').style.width=powPct+'%';
+    setH('cy-spd',S.speed.toFixed(1)+' <span style="font-size:11px;opacity:.6">km/h</span>');
+    setH('cy-cad',S.cadRPM>0?S.cadRPM+' <span style="font-size:11px;opacity:.6">rpm</span>':'– <span style="font-size:11px;opacity:.6">rpm</span>');
+    setH('cy-dist',dist.toFixed(2)+' <span style="font-size:11px;opacity:.6">km</span>');
+    setH('cy-cals',cals+' <span style="font-size:11px;opacity:.6">kcal</span>');
+    setH('cy-maxspd',S.maxSpeed.toFixed(1));
+    setH('cy-avgspd',avgSpd);
+    setH('cy-elev',elevGain);
+    setH('cy-avgpow',avgPow);
+  } else {
+    const act=ACTS[S.actKey]||ACTS.walking;
+    // Auto-detect activity from speed
+    let detKey='walking';
+    if(S.speed>=7)detKey='running';
+    else if(S.speed>=4)detKey='fastWalk';
+    const detAct=ACTS[detKey];
+    const badge=$i('act-badge');
+    if(badge){badge.textContent=detAct.icon+' '+detAct.label;badge.style.background=`rgba(${detAct.rgb},.15)`;badge.style.border=`1px solid ${detAct.color}`;badge.style.color=detAct.color;}
+    const timerEl=$i('timer');if(timerEl){timerEl.textContent=fmtT(S.elapsed);timerEl.style.color=detAct.color;}
+    setH('l-steps',S.steps.toLocaleString());
+    setH('l-dist',dist.toFixed(2)+' <span style="font-size:11px;opacity:.6">km</span>');
+    setH('l-cals',cals+' <span style="font-size:11px;opacity:.6">kcal</span>');
+    setH('l-spd',S.speed.toFixed(1)+' <span style="font-size:11px;opacity:.6">km/h</span>');
+    setH('l-pace',pace+"'");setH('l-spm',spm);setH('l-gpct',Math.round(gpct*100)+'%');
+  }
+
+  // Dashboard live updates
+  const todayTotal=S.totalStepsToday+S.steps;
+  updateRing(todayTotal);
+  setH('d-spd',S.speed.toFixed(1)+' <span style="font-size:11px;opacity:.6">km/h</span>');
+  setH('d-time',fmtT(S.elapsed).slice(0,5));
+}
+
+// ═══════════════════════════════════════════════════
+//  GPS CANVAS
+// ═══════════════════════════════════════════════════
+function drawRoute(){
+  const route=S.gpsRoute;
+  if(route.length<2)return;
+  const ph=$i('map-ph'),cv=$i('route-canvas');
+  if(!ph||!cv)return;
+  ph.style.display='none';cv.style.display='block';
+  const W=cv.offsetWidth||310,H=cv.offsetHeight||171;
+  cv.width=W;cv.height=H;
+  const ctx=cv.getContext('2d');
+  ctx.clearRect(0,0,W,H);
+  const lats=route.map(p=>p.lat),lngs=route.map(p=>p.lng);
+  const minLat=Math.min(...lats),maxLat=Math.max(...lats);
+  const minLng=Math.min(...lngs),maxLng=Math.max(...lngs);
+  const pad=24,sX=(W-pad*2)/(maxLng-minLng||.0001),sY=(H-pad*2)/(maxLat-minLat||.0001),sc=Math.min(sX,sY);
+  const tX=lg=>(lg-minLng)*sc+pad+(W-pad*2-(maxLng-minLng)*sc)/2;
+  const tY=la=>H-((la-minLat)*sc+pad+(H-pad*2-(maxLat-minLat)*sc)/2);
+  const col=S.actKey==='cycling'?'#06B6D4':(ACTS[S.actKey]?.color||'#10B981');
+  ctx.strokeStyle=col;ctx.lineWidth=3;ctx.lineCap='round';ctx.lineJoin='round';ctx.shadowBlur=10;ctx.shadowColor=col;
+  ctx.beginPath();route.forEach((p,i)=>i===0?ctx.moveTo(tX(p.lng),tY(p.lat)):ctx.lineTo(tX(p.lng),tY(p.lat)));ctx.stroke();
+  ctx.beginPath();ctx.arc(tX(route[0].lng),tY(route[0].lat),6,0,Math.PI*2);ctx.fillStyle='#10B981';ctx.shadowColor='#10B981';ctx.fill();
+  const e=route[route.length-1];ctx.beginPath();ctx.arc(tX(e.lng),tY(e.lat),9,0,Math.PI*2);ctx.fillStyle=col;ctx.shadowColor=col;ctx.fill();
+}
+
+function renderCySegs(){
+  const el=$i('cy-segs');if(!el)return;
+  if(!S.cySegs.length){el.innerHTML='<div style="font-size:12px;color:rgba(255,255,255,.3);font-weight:600;padding:8px 0">Les segments apparaîtront tous les 1 km…</div>';return;}
+  el.innerHTML=S.cySegs.map(s=>`
+    <div class="cy-seg">
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="width:28px;height:28px;border-radius:8px;background:rgba(6,182,212,.15);border:1px solid rgba(6,182,212,.3);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue';font-size:14px;color:var(--cy)">${s.km}</div>
+        <span style="font-family:'Barlow Condensed';font-weight:700;font-size:13px;text-transform:uppercase">${s.km} km</span>
+      </div>
+      <div style="text-align:right">
+        <div style="font-family:'Bebas Neue';font-size:16px;color:var(--cy)">${s.spd} <span style="font-size:10px;opacity:.6">km/h</span></div>
+        <div style="font-size:10px;color:rgba(255,255,255,.35);font-weight:700">${s.time}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ═══════════════════════════════════════════════════
+//  NAVIGATION & RENDERING
+// ═══════════════════════════════════════════════════
+function goTab(tab){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));
+  $i('page-'+tab).classList.add('active');
+  $i('nav-'+tab).classList.add('on');
+  $i('screen').scrollTop=0;
+  ({dashboard:renderDashboard,track:renderTrack,stats:renderStats,history:renderHistory,profile:renderProfilePage})[tab]?.();
+}
+
+// ── DASHBOARD ──
+function renderDashboard(){
+  const p=getProfile();
+  $i('date-lbl').textContent=new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
+  setT('dash-name',p.name.split(' ')[0]);
+  const todayTotal=S.totalStepsToday+(S.isTracking?S.steps:0);
+  updateRing(todayTotal);
+  setH('goal-lbl',p.stepGoal.toLocaleString()+' pas');
+  setH('remain-lbl',Math.max(0,p.stepGoal-todayTotal).toLocaleString());
+  const w=p.weight;
+  const dist=(todayTotal*0.00075).toFixed(2);
+  setH('d-cals',Math.round(todayTotal*.04*(w/70))+' <span style="font-size:12px;opacity:.6">kcal</span>');
+  setH('d-dist',dist+' <span style="font-size:12px;opacity:.6">km</span>');
+  const hist=S.history.slice(0,7);
+  const maxS=Math.max(...hist.map(h=>h.steps),1);
+  const avgS=hist.length?Math.round(hist.reduce((a,b)=>a+b.steps,0)/hist.length):0;
+  const wkD=hist.reduce((a,b)=>a+b.distance,0).toFixed(1);
+  const wkC=hist.reduce((a,b)=>a+b.calories,0);
+  const gMet=hist.filter(h=>h.steps>=p.stepGoal).length;
+  setT('avg-s',avgS.toLocaleString());setT('wk-dist',wkD+' km');setT('wk-cals',wkC);setT('goals-met',gMet);
+  // Streak
+  const streak=Math.min(S.history.length,7);setT('streak-cnt',streak);
+  const wkChart=$i('wk-chart');
+  if(wkChart)wkChart.innerHTML=[...hist].reverse().map(h=>`<div class="bar-col"><div class="bar-fill" style="height:${(h.steps/maxS*80)+4}px;background:var(--g)"></div><div class="bar-lbl">${h.day}</div></div>`).join('');
+  // Dash button
+  const btn=$i('dash-btn');
+  if(btn){
+    if(S.isTracking){btn.innerHTML='<span class="pulse" style="font-size:8px;color:var(--g)">●</span> Activité en cours…';btn.style.cssText='background:rgba(16,185,129,.12);border:1px solid var(--g);color:var(--g);width:100%;padding:14px;border-radius:14px;font-family:"Barlow Condensed";font-size:17px;font-weight:800;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px';btn.onclick=()=>goTab('track');}
+    else{btn.innerHTML='▶ Démarrer une activité';btn.style.cssText='background:linear-gradient(135deg,#10B981,#059669);color:#fff;box-shadow:0 4px 22px rgba(16,185,129,.38);width:100%;padding:14px;border-radius:14px;border:none;font-family:"Barlow Condensed";font-size:17px;font-weight:800;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px';btn.onclick=dashStart;}
+  }
+}
+
+function updateRing(steps){
+  const goal=getProfile().stepGoal;
+  const pct=Math.min(steps/goal,1);
+  const circ=2*Math.PI*53;
+  const off=circ*(1-pct);
+  const c=$i('ring-c');if(c)c.style.strokeDashoffset=off;
+  setT('ring-steps',steps.toLocaleString());
+  setT('ring-pct',Math.round(pct*100)+'%');
+  const pf=$i('prog-fill');if(pf)pf.style.width=(pct*100)+'%';
+}
+
+// ── TRACK ──
+function renderTrack(){
+  const isCy=S.actKey==='cycling';
+  $i('trk-title').textContent=S.isTracking?'Session en cours':'Nouvelle activité';
+  $i('act-selector').style.display=S.isTracking?'none':'block';
+  $i('live-generic').style.display=(S.isTracking&&!isCy)?'block':'none';
+  $i('live-cycling').style.display=(S.isTracking&&isCy)?'block':'none';
+  $i('map-section').style.display=S.isTracking?'block':'none';
+  $i('ctrl-start').style.display=S.isTracking?'none':'block';
+  $i('ctrl-session').style.display=S.isTracking?'flex':'none';
+  if(!S.isTracking){buildActGrid();}
+  if(S.isTracking){drawRoute();if(isCy)renderCySegs();}
+  if(!S.isTracking){$i('map-ph').style.display='flex';$i('route-canvas').style.display='none';}
+}
+
+function buildActGrid(){
+  const grid=$i('act-grid');if(!grid)return;
+  grid.innerHTML=Object.entries(ACTS).map(([k,v])=>{
+    const sel=S.actKey===k;
+    const extra=k==='cycling'?`<span style="font-size:9px;color:rgba(6,182,212,.7);font-weight:700;margin-top:3px;display:block">⚡ Puissance • Cadence • Segments</span>`:'';
+    return`<button class="act-btn" onclick="selectAct('${k}')" id="ab-${k}"
+      style="border-color:${sel?v.color:'rgba(255,255,255,.1)'};background:${sel?`rgba(${v.rgb},.18)`:'rgba(255,255,255,.05)'}">
+      <span style="font-size:22px">${v.icon}</span>
+      <span style="font-family:'Barlow Condensed';font-weight:700;font-size:13px;color:#fff;text-transform:uppercase;letter-spacing:.5px">${v.label}</span>
+      <span style="font-size:10px;color:rgba(255,255,255,.38);font-weight:600">${v.spd[0]}–${Math.min(v.spd[1],99)} km/h</span>
+      ${extra}
+    </button>`;
+  }).join('');
+}
+
+function selectAct(k){
+  S.actKey=k;
+  document.querySelectorAll('.act-btn').forEach(b=>{
+    const key=b.id.replace('ab-','');
+    const v=ACTS[key];
+    b.style.borderColor=key===k?v.color:'rgba(255,255,255,.1)';
+    b.style.background=key===k?`rgba(${v.rgb},.18)`:'rgba(255,255,255,.05)';
+  });
+}
+
+// ── STATS ──
+let curPeriod='week';
+function setPeriod(p){
+  curPeriod=p;
+  $i('btn-wk').style.background=p==='week'?'var(--g)':'rgba(255,255,255,.07)';
+  $i('btn-wk').style.color=p==='week'?'#fff':'rgba(255,255,255,.45)';
+  $i('btn-mo').style.background=p==='month'?'var(--g)':'rgba(255,255,255,.07)';
+  $i('btn-mo').style.color=p==='month'?'#fff':'rgba(255,255,255,.45)';
+  renderStats();
+}
+function renderStats(){
+  const data=curPeriod==='week'?S.history.slice(0,7):S.history.slice(0,Math.min(30,S.history.length));
+  if(!data.length){$i('st-summary').innerHTML='<div style="font-size:13px;color:rgba(255,255,255,.35);grid-column:span 3;padding:12px 0">Aucune activité enregistrée.</div>';return;}
+  const tS=data.reduce((a,b)=>a+b.steps,0);
+  const tD=data.reduce((a,b)=>a+b.distance,0).toFixed(1);
+  const tC=data.reduce((a,b)=>a+b.calories,0);
+  $i('st-summary').innerHTML=`
+    <div class="card" style="text-align:center;padding:11px"><div style="font-size:17px">👣</div><div style="font-family:'Bebas Neue';font-size:17px;color:var(--g);margin-top:2px">${tS.toLocaleString()}</div><div style="font-size:9px;color:rgba(255,255,255,.38);font-weight:700;text-transform:uppercase;margin-top:1px">Pas totaux</div></div>
+    <div class="card" style="text-align:center;padding:11px"><div style="font-size:17px">📍</div><div style="font-family:'Bebas Neue';font-size:17px;color:var(--b);margin-top:2px">${tD}km</div><div style="font-size:9px;color:rgba(255,255,255,.38);font-weight:700;text-transform:uppercase;margin-top:1px">Distance</div></div>
+    <div class="card" style="text-align:center;padding:11px"><div style="font-size:17px">🔥</div><div style="font-family:'Bebas Neue';font-size:17px;color:var(--o);margin-top:2px">${tC}</div><div style="font-size:9px;color:rgba(255,255,255,.38);font-weight:700;text-transform:uppercase;margin-top:1px">Calories</div></div>`;
+  const maxS=Math.max(...data.map(h=>h.steps),1);
+  const W=320,H=85,pad=8;
+  const pts=data.map((h,i)=>[data.length<2?W/2:pad+(W-pad*2)*(i/(data.length-1)),H-pad-(H-pad*2)*(h.steps/maxS)]);
+  const pD=pts.map((p,i)=>(i===0?`M${p[0]},${p[1]}`:`L${p[0]},${p[1]}`)).join(' ');
+  const fD=pD+` L${pts[pts.length-1][0]},${H} L${pts[0][0]},${H} Z`;
+  $i('steps-svg').innerHTML=`<defs><linearGradient id="gf" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#10B981" stop-opacity=".28"/><stop offset="100%" stop-color="#10B981" stop-opacity="0"/></linearGradient></defs><path d="${fD}" fill="url(#gf)"/><path d="${pD}" fill="none" stroke="#10B981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>${pts.map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="3.5" fill="#10B981"/>`).join('')}`;
+  $i('steps-xlbl').innerHTML=data.map(h=>`<div style="flex:1;text-align:center;font-size:9px;font-weight:700;color:rgba(255,255,255,.35);font-family:Barlow">${h.day}</div>`).join('');
+  const maxC=Math.max(...data.map(h=>h.calories),1);
+  $i('cals-chart').innerHTML=data.map(h=>`<div class="bar-col"><div class="bar-fill" style="height:${(h.calories/maxC*68)+3}px;background:var(--o);opacity:.82"></div><div class="bar-lbl">${h.day}</div></div>`).join('');
+  const aM={};S.history.forEach(h=>{aM[h.activity]=(aM[h.activity]||0)+1;});
+  const tot=S.history.length;
+  $i('act-breakdown').innerHTML=Object.entries(aM).map(([k,cnt])=>{
+    const a=ACTS[k];if(!a)return'';const pct=(cnt/tot)*100;
+    return`<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+      <div style="width:36px;height:36px;border-radius:10px;background:rgba(${a.rgb},.15);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">${a.icon}</div>
+      <div style="flex:1"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-family:'Barlow Condensed';font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.5px">${a.label}</span><span style="font-size:11px;color:${a.color};font-weight:700">${cnt} séances</span></div>
+      <div style="height:5px;background:rgba(255,255,255,.08);border-radius:4px;overflow:hidden"><div style="height:100%;width:${pct}%;background:${a.color};box-shadow:0 0 6px ${a.color}"></div></div></div></div>`;
+  }).join('');
+}
+
+// ── HISTORY ──
+function renderHistory(){
+  const cnt=$i('hist-cnt');if(cnt)cnt.textContent=S.history.length+' activités enregistrées';
+  const list=$i('hist-list');if(!list)return;
+  if(!S.history.length){list.innerHTML='<div style="font-size:13px;color:rgba(255,255,255,.35);padding:20px 0;text-align:center">Aucune activité.<br>Démarrez votre première session !</div>';return;}
+  list.innerHTML=S.history.map(item=>{
+    const a=ACTS[item.activity]||ACTS.walking;
+    const dur=typeof item.duration==='number'?(item.duration>90?fmtT(item.duration):item.duration+' min'):item.duration;
+    const extras=[];
+    if(item.maxSpeed)extras.push('Vmax '+item.maxSpeed+' km/h');
+    if(item.avgPow)extras.push('~'+item.avgPow+'W moy');
+    if(item.elevGain)extras.push('↑'+item.elevGain+'m');
+    return`<div class="hi-row">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:40px;height:40px;border-radius:11px;background:rgba(${a.rgb},.15);border:1px solid rgba(${a.rgb},.25);display:flex;align-items:center;justify-content:center;font-size:19px">${a.icon}</div>
+        <div>
+          <div style="font-family:'Barlow Condensed';font-weight:700;font-size:14px;text-transform:uppercase;letter-spacing:.5px">${a.label}</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.4);font-weight:600">${item.day||''} • ${dur}</div>
+          ${extras.length?`<div style="font-size:10px;color:${a.color};font-weight:700;margin-top:1px">${extras.join(' • ')}</div>`:''}
+        </div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-family:'Bebas Neue';font-size:18px;color:${a.color};letter-spacing:.5px">${item.steps.toLocaleString()} <span style="font-size:10px;opacity:.5">pas</span></div>
+        <div style="font-size:11px;color:rgba(255,255,255,.4);font-weight:600">${item.distance}km • ${item.calories} kcal</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── PROFILE ──
+function renderProfilePage(){
+  const p=getProfile();
+  $i('pr-name').value=p.name;
+  $i('pr-sub').textContent=`${p.height}cm • ${p.weight}kg • ${p.age}ans`;
+  $i('av-ico').textContent=p.gender==='male'?'🧑‍🦱':'👩';
+  $i('sl-wt').value=p.weight;$i('pr-wt').textContent=p.weight;
+  $i('sl-ht').value=p.height;$i('pr-ht').textContent=p.height;
+  $i('sl-age').value=p.age;$i('pr-age').textContent=p.age;
+  $i('goal-sl').value=p.stepGoal;
+  $i('goal-disp').textContent=p.stepGoal.toLocaleString();
+  updateBMI(p);
+  renderAchs();
+  updateGenderBtns(p.gender);
+}
+function updateBMI(p){
+  const bmi=(p.weight/((p.height/100)**2)).toFixed(1);
+  const col=bmi<18.5?'#3B82F6':bmi<25?'#10B981':bmi<30?'#F59E0B':'#EF4444';
+  const lbl=bmi<18.5?'Insuffisant':bmi<25?'Normal ✓':bmi<30?'Surpoids':'Obésité';
+  const ic=$i('bmi-ico'),v=$i('bmi-v'),l=$i('bmi-lbl');
+  if(ic){ic.style.background=`rgba(${h2r(col)},.14)`;ic.style.border=`1px solid ${col}`;ic.style.color=col;}
+  if(v){v.textContent=bmi;v.style.color=col;}if(l){l.textContent=lbl;l.style.color=col;}
+}
+function renderAchs(){
+  const todayTotal=S.totalStepsToday;
+  const achs=[
+    {i:'🥇',l:'10K pas',d:'Premier 10 000',e:todayTotal>=10000||S.history.some(h=>h.steps>=10000)},
+    {i:'🔥',l:'7 jours',d:'Streak 7 jours',e:S.history.length>=7},
+    {i:'🚀',l:'5 km',d:'5 km en session',e:S.history.some(h=>h.distance>=5)},
+    {i:'⚡',l:'Sprinter',d:'Course >10km/h',e:S.history.some(h=>h.maxSpeed>10&&h.activity==='running')},
+    {i:'🚴',l:'Cycliste',d:'10km à vélo',e:S.history.some(h=>h.activity==='cycling'&&h.distance>=10)},
+    {i:'💪',l:'200W',d:'200W en vélo',e:S.history.some(h=>h.avgPow&&h.avgPow>=200)},
+    {i:'🌟',l:'Régulier',d:'10 séances',e:S.history.length>=10},
+    {i:'🏔',l:'Dénivelé',d:'+500m cumulés',e:S.history.reduce((a,h)=>a+(h.elevGain||0),0)>=500},
+    {i:'🎯',l:'Objectif',d:'5 objectifs atteints',e:S.history.filter(h=>h.steps>=getProfile().stepGoal).length>=5},
+  ];
+  $i('achievements').innerHTML=achs.map(a=>`<div class="trophy-card ${a.e?'earned':'locked'}"><div style="font-size:21px">${a.i}</div><div style="font-family:'Barlow Condensed';font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.5px;margin-top:4px;color:${a.e?'var(--y)':'rgba(255,255,255,.45)'}">${a.l}</div><div style="font-size:9px;color:rgba(255,255,255,.3);margin-top:1px">${a.d}</div></div>`).join('');
+}
+
+// ── PROFILE ACTIONS ──
+function saveProfile(key,val){
+  if(!currentUser)return;
+  currentUser[key]=val;
+  const users=LS.get('ft_users',{});
+  users[currentUser.email]=currentUser;
+  LS.set('ft_users',users);
+  if(key==='name'){setT('dash-name',val.split(' ')[0]);$i('pr-sub').textContent=`${currentUser.height}cm • ${currentUser.weight}kg • ${currentUser.age}ans`;}
+  if(['weight','height','age'].includes(key)){$i('pr-sub').textContent=`${currentUser.height}cm • ${currentUser.weight}kg • ${currentUser.age}ans`;updateBMI(currentUser);}
+  if(key==='stepGoal')setH('goal-lbl',val.toLocaleString()+' pas');
+}
+function setGender(g){
+  saveProfile('gender',g);
+  $i('av-ico').textContent=g==='male'?'🧑‍🦱':'👩';
+  updateGenderBtns(g);
+}
+function updateGenderBtns(g){
+  const bm=$i('btn-m'),bf=$i('btn-f');
+  if(bm){bm.style.borderColor=g==='male'?'var(--g)':'rgba(255,255,255,.1)';bm.style.background=g==='male'?'rgba(16,185,129,.14)':'rgba(255,255,255,.04)';bm.style.color=g==='male'?'var(--g)':'rgba(255,255,255,.45)';}
+  if(bf){bf.style.borderColor=g==='female'?'var(--g)':'rgba(255,255,255,.1)';bf.style.background=g==='female'?'rgba(16,185,129,.14)':'rgba(255,255,255,.04)';bf.style.color=g==='female'?'var(--g)':'rgba(255,255,255,.45)';}
+}
+function getProfile(){return currentUser||{name:'–',weight:70,height:175,age:30,gender:'male',stepGoal:10000};}
+
+// ═══════════════════════════════════════════════════
+//  PERSISTENCE
+// ═══════════════════════════════════════════════════
+function saveHistory(){
+  if(!currentUser)return;
+  LS.set('ft_hist_'+currentUser.email,S.history);
+}
+function loadHistory(){
+  if(!currentUser)return;
+  const saved=LS.get('ft_hist_'+currentUser.email,null);
+  if(saved&&saved.length){S.history=saved;}
+  else{S.history=genHistory();}
+}
+
+// ═══════════════════════════════════════════════════
+//  CLOCK
+// ═══════════════════════════════════════════════════
+function updateClock(){const t=new Date();$i('clock').textContent=String(t.getHours()).padStart(2,'0')+':'+String(t.getMinutes()).padStart(2,'0');}
+setInterval(updateClock,10000);updateClock();
+
+// ═══════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════
+function initApp(){
+  loadHistory();
+  S.totalStepsToday=0;
+  renderDashboard();renderTrack();renderStats();renderHistory();renderProfilePage();
+  // Start GPS in background to pre-warm
+  if(navigator.geolocation){
+    navigator.geolocation.getCurrentPosition(pos=>{
+      S.gpsLoc={lat:pos.coords.latitude,lng:pos.coords.longitude};
+      setDot('dot-gps',true);setT('gps-label','Prêt');
+      $i('gps-ico').style.opacity='1';
+    },()=>{setT('gps-label','Accès refusé');},{enableHighAccuracy:true,timeout:8000});
+  }
+}
+</script>
+</body>
+</html>
