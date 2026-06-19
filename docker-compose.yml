@@ -1,0 +1,92 @@
+
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: fittrack-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: fittrack_user
+      POSTGRES_PASSWORD: fittrack_password
+      POSTGRES_DB: fittrack_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fittrack_user -d fittrack_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: fittrack-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: fittrack-backend
+    restart: always
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USERNAME: fittrack_user
+      DB_PASSWORD: fittrack_password
+      DB_NAME: fittrack_db
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      JWT_ACCESS_SECRET: super_secret_access_key_123!
+      JWT_REFRESH_SECRET: super_secret_refresh_key_456!
+      JWT_ACCESS_EXPIRY: 900s
+      JWT_REFRESH_EXPIRY: 30d
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./backend:/usr/src/app
+      - /usr/src/app/node_modules
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: fittrack-frontend
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: fittrack-pgadmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@fittrack.com
+      PGADMIN_DEFAULT_PASSWORD: admin_password_123
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:
+  redis_data:
