@@ -25,6 +25,10 @@ yarn-error.log*
 # Coverage reports
 coverage/
 
+# Docker volumes
+postgres_data/
+redis_data/
+
 # Misc temporary files
 tmp/
 .cache/
