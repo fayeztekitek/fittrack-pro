@@ -185,26 +185,31 @@ export class AuthService {
   }
 
   async seedDemoAccount() {
-    const demoEmail = 'demo@fit.com';
-    const demoUser = await this.usersService.findByEmail(demoEmail);
-    if (!demoUser) {
-      const passwordHash = await bcrypt.hash('demo123', 12);
-      await this.usersService.create(
-        {
-          email: demoEmail,
-          passwordHash,
-          name: 'Demo Account',
-          role: 'user',
-        },
-        {
-          weightKg: 70.0,
-          heightCm: 175,
-          age: 30,
-          gender: 'male' as any,
-          stepGoal: 10000,
-        },
-      );
-      console.log('Demo account seeded: demo@fit.com / demo123');
+    try {
+      const demoEmail = 'demo@fit.com';
+      const demoUser = await this.usersService.findByEmail(demoEmail);
+      if (!demoUser) {
+        const passwordHash = await bcrypt.hash('demo123', 12);
+        await this.usersService.create(
+          {
+            email: demoEmail,
+            passwordHash,
+            name: 'Demo Account',
+            role: 'user',
+          },
+          {
+            weightKg: 70.0,
+            heightCm: 175,
+            age: 30,
+            gender: 'male' as any,
+            stepGoal: 10000,
+          },
+        );
+        console.log('Demo account seeded: demo@fit.com / demo123');
+      }
+    } catch (err) {
+      // Tables may not exist yet during first run — retry on next request
+      console.log('Seed deferred (tables not ready): demo@fit.com / demo123');
     }
   }
 }

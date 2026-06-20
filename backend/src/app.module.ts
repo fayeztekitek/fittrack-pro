@@ -13,8 +13,10 @@ import { AuditModule } from './modules/audit/audit.module';
 @Module({
   imports: [
     // Load environment variables globally
+    // Supports both local dev (../.env) and docker (env vars injected directly)
     ConfigModule.forRoot({
       isGlobal: true,
+      envFilePath: ['../.env', '.env'],
     }),
 
     // Configure TypeORM asynchronously with database environment variables
