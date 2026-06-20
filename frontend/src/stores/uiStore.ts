@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { Language } from '../i18n/translations';
+import type { Language } from '../i18n/translations';
 
 interface UIState {
   language: Language;

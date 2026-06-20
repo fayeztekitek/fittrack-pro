@@ -57,6 +57,10 @@ export class UsersService {
     return this.profileRepository.save(profile);
   }
 
+  async updateName(userId: string, name: string): Promise<void> {
+    await this.userRepository.update(userId, { name });
+  }
+
   async updateLastLogin(userId: string): Promise<void> {
     await this.userRepository.update(userId, { lastLoginAt: new Date() });
   }

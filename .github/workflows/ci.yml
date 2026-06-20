@@ -25,8 +25,17 @@ jobs:
         run: npm ci
         working-directory: ./backend
 
+      - name: Run Lint
+        run: npm run lint
+        working-directory: ./backend
+        continue-on-error: false
+
       - name: Run Build
         run: npm run build
+        working-directory: ./backend
+
+      - name: Run Unit Tests
+        run: npm run test
         working-directory: ./backend
 
   frontend-ci:
@@ -47,6 +56,15 @@ jobs:
         run: npm ci
         working-directory: ./frontend
 
+      - name: Run Lint
+        run: npm run lint
+        working-directory: ./frontend
+        continue-on-error: false
+
       - name: Run Build
         run: npm run build
+        working-directory: ./frontend
+
+      - name: Run Unit Tests
+        run: npm run test
         working-directory: ./frontend

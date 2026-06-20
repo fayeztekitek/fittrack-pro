@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3.0'
 services:
   postgres:
     image: postgres:16-alpine
@@ -13,7 +13,7 @@ services:
     volumes:
       - ./postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U fittrack_user -d fittrack_db"]
+      test: [ "CMD-SHELL", "pg_isready -U fittrack_user -d fittrack_db" ]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -27,7 +27,7 @@ services:
     volumes:
       - ./redis_data:/data
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: [ "CMD", "redis-cli", "ping" ]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -55,10 +55,8 @@ services:
     ports:
       - "3000:3000"
     depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
+      - postgres
+      - redis
     volumes:
       - ./backend:/usr/src/app
       - /usr/src/app/node_modules
@@ -85,5 +83,3 @@ services:
       - "5050:80"
     depends_on:
       - postgres
-
-

@@ -4,6 +4,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { ActivitiesModule } from './modules/activities/activities.module';
+import { ProfileModule } from './modules/profile/profile.module';
+import { StatsModule } from './modules/stats/stats.module';
 
 @Module({
   imports: [
@@ -37,6 +40,9 @@ import { AuthModule } from './modules/auth/auth.module';
     // App Feature Modules
     UsersModule,
     AuthModule,
+    ActivitiesModule,
+    ProfileModule,
+    StatsModule,
   ],
 })
 export class AppModule {}

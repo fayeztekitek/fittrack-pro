@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAuthStore } from '../../stores/authStore';
 import { useTranslation } from '../../i18n/useTranslation';
-import { User, Mail, Lock, Scale, Loader2, ArrowRight } from 'lucide-react';
+import { User, Mail, Lock, Loader2, ArrowRight } from 'lucide-react';
 import { Gender } from '../../users/entities/user-profile.entity';
 
 interface SignupFormProps {

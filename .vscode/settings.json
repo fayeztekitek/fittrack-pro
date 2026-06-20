@@ -1,0 +1,7 @@
+{
+    "mcp-ollama.autoStart": true,
+    "mcp-ollama.extensionLogLevel": "debug",
+    "mcp-ollama.logLevel": "debug",
+    "mcp-ollama.serverHost": "127.0.0.1",
+    "editor.defaultFormatter": "internetics.mcp-ollama-extension"
+}

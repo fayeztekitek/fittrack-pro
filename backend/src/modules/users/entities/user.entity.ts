@@ -5,8 +5,11 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToOne,
+  OneToMany,
 } from 'typeorm';
 import { UserProfile } from './user-profile.entity';
+import { Activity } from '../../activities/entities/activity.entity';
+import { Achievement } from '../../activities/entities/achievement.entity';
 
 @Entity('users')
 export class User {
@@ -39,4 +42,12 @@ export class User {
 
   @OneToOne(() => UserProfile, (profile) => profile.user, { cascade: true })
   profile: UserProfile;
+
+  @OneToMany(() => Activity, (activity) => activity.user, { cascade: false })
+  activities: Activity[];
+
+  @OneToMany(() => Achievement, (achievement) => achievement.user, {
+    cascade: false,
+  })
+  achievements: Achievement[];
 }
