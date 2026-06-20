@@ -1,9 +1,8 @@
-import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
-import { activityApiService, statsService } from '../services';
+import { useActivitiesQuery } from '../hooks';
+import { statsService } from '../services';
 import type { StatsSummary, DailyStats } from '../services/statsService';
-import type { Activity } from '../types/activity.types';
 import { StepRing } from '../components/dashboard/StepRing';
 import { DailyKpis } from '../components/dashboard/DailyKpis';
 import { WeeklyChart } from '../components/dashboard/WeeklyChart';
@@ -13,23 +12,8 @@ import { Play } from 'lucide-react';
 export function DashboardPage() {
   const { user } = useAuthStore();
   const navigate = useNavigate();
-  const [activities, setActivities] = useState<Activity[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    loadActivities();
-  }, []);
-
-  async function loadActivities() {
-    try {
-      const res = await activityApiService.listActivities({ take: 100 });
-      setActivities(res.data || []);
-    } catch {
-      // API may not be available - show empty state
-    } finally {
-      setLoading(false);
-    }
-  }
+  const { data: activitiesResponse, isLoading } = useActivitiesQuery({ take: 100 });
+  const activities = activitiesResponse?.data || [];
 
   const stepGoal = user?.profile?.stepGoal || 10000;
   const today = new Date().toISOString().split('T')[0];
@@ -93,7 +77,7 @@ export function DashboardPage() {
 
       {/* Weekly Chart */}
       <div className="p-5 bg-slate-900/60 border border-slate-800 rounded-2xl backdrop-blur-md">
-        {loading ? (
+        {isLoading ? (
           <div className="h-32 flex items-center justify-center">
             <div className="w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
           </div>

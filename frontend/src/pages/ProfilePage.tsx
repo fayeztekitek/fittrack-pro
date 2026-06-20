@@ -1,17 +1,19 @@
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuthStore } from '../stores/authStore';
-import { achievementService } from '../services';
-import type { Achievement } from '../types/activity.types';
+import { useAchievementsQuery, useUpdateProfileMutation } from '../hooks';
+import { useUIStore } from '../stores/uiStore';
 import { BmiCard } from '../components/profile/BmiCard';
 import { BodySliders } from '../components/profile/BodySliders';
 import { GoalSlider } from '../components/profile/GoalSlider';
 import { GenderToggle } from '../components/profile/GenderToggle';
 import { AchievementGrid } from '../components/profile/AchievementGrid';
-import { User, LogOut } from 'lucide-react';
+import { User, LogOut, Loader2, Save } from 'lucide-react';
 
 export function ProfilePage() {
   const { user, logout } = useAuthStore();
-  const [achievements, setAchievements] = useState<Achievement[]>([]);
+  const { data: achievements = [] } = useAchievementsQuery();
+  const updateProfile = useUpdateProfileMutation();
+  const addToast = useUIStore((s) => s.addToast);
 
   const [weightKg, setWeightKg] = useState(user?.profile?.weightKg || 70);
   const [heightCm, setHeightCm] = useState(user?.profile?.heightCm || 170);
@@ -20,17 +22,25 @@ export function ProfilePage() {
     user?.profile?.gender || 'male',
   );
   const [stepGoal, setStepGoal] = useState(user?.profile?.stepGoal || 10000);
+  const [dirty, setDirty] = useState(false);
 
   useEffect(() => {
-    loadAchievements();
-  }, []);
+    setDirty(true);
+  }, [weightKg, heightCm, age, gender, stepGoal]);
 
-  async function loadAchievements() {
+  async function handleSave() {
     try {
-      const data = await achievementService.getAchievements();
-      setAchievements(data);
+      await updateProfile.mutateAsync({
+        weightKg,
+        heightCm,
+        age,
+        gender,
+        stepGoal,
+      });
+      setDirty(false);
+      addToast('success', 'Profile saved successfully');
     } catch {
-      // API may not be available yet
+      addToast('error', 'Failed to save profile');
     }
   }
 
@@ -61,6 +71,9 @@ export function ProfilePage() {
         </div>
         <h2 className="text-xl font-bold text-white">{user?.name}</h2>
         <p className="text-xs text-slate-500 mt-0.5">{user?.email}</p>
+        {dirty && (
+          <p className="text-xs text-amber-400 mt-1">Unsaved changes</p>
+        )}
       </div>
 
       {/* BMI Card */}
@@ -93,6 +106,20 @@ export function ProfilePage() {
       <div className="p-5 bg-slate-900/60 border border-slate-800 rounded-2xl backdrop-blur-md">
         <GoalSlider value={stepGoal} onChange={setStepGoal} />
       </div>
+
+      {/* Save Button */}
+      <button
+        onClick={handleSave}
+        disabled={!dirty || updateProfile.isPending}
+        className="w-full py-3 px-4 bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 disabled:bg-emerald-800/30 text-white font-bold rounded-xl shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2 transition disabled:cursor-not-allowed"
+      >
+        {updateProfile.isPending ? (
+          <Loader2 size={18} className="animate-spin" />
+        ) : (
+          <Save size={18} />
+        )}
+        {updateProfile.isPending ? 'Saving...' : 'Save Profile'}
+      </button>
 
       {/* Achievements */}
       <div>

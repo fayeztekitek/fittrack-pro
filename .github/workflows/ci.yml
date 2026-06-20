@@ -1,70 +1,175 @@
-name: FitTrack Pro CI
+name: CI
 
 on:
   push:
-    branches: [ main, master, dev ]
+    branches: [main, develop]
   pull_request:
-    branches: [ main, master, dev ]
+    branches: [main]
+
+env:
+  NODE_VERSION: '20'
 
 jobs:
-  backend-ci:
-    name: Backend CI
+  lint:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: 'npm'
-          cache-dependency-path: backend/package-lock.json
+          node-version: ${{ env.NODE_VERSION }}
 
-      - name: Install Dependencies
+      - name: Install backend deps
+        working-directory: backend
         run: npm ci
-        working-directory: ./backend
 
-      - name: Run Lint
+      - name: Install frontend deps
+        working-directory: frontend
+        run: npm ci
+
+      - name: Lint backend
+        working-directory: backend
         run: npm run lint
-        working-directory: ./backend
-        continue-on-error: false
 
-      - name: Run Build
-        run: npm run build
-        working-directory: ./backend
+      - name: Lint frontend
+        working-directory: frontend
+        run: npm run lint
 
-      - name: Run Unit Tests
-        run: npm run test
-        working-directory: ./backend
-
-  frontend-ci:
-    name: Frontend CI
+  build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: 'npm'
-          cache-dependency-path: frontend/package-lock.json
+          node-version: ${{ env.NODE_VERSION }}
 
-      - name: Install Dependencies
+      - name: Install backend deps
+        working-directory: backend
         run: npm ci
-        working-directory: ./frontend
 
-      - name: Run Lint
-        run: npm run lint
-        working-directory: ./frontend
-        continue-on-error: false
+      - name: Install frontend deps
+        working-directory: frontend
+        run: npm ci
 
-      - name: Run Build
+      - name: Build backend
+        working-directory: backend
         run: npm run build
-        working-directory: ./frontend
 
-      - name: Run Unit Tests
-        run: npm run test
-        working-directory: ./frontend
+      - name: Build frontend
+        working-directory: frontend
+        run: npm run build
+
+  unit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install backend deps
+        working-directory: backend
+        run: npm ci
+
+      - name: Install frontend deps
+        working-directory: frontend
+        run: npm ci
+
+      - name: Backend unit tests
+        working-directory: backend
+        run: npm test
+
+      - name: Frontend unit tests
+        working-directory: frontend
+        run: npm test
+
+  integration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install backend deps
+        working-directory: backend
+        run: npm ci
+
+      - name: Integration tests (Testcontainers)
+        working-directory: backend
+        run: npm run test:integration
+        env:
+          DOCKER_HOST: unix:///var/run/docker.sock
+
+  e2e:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: fittrack_user
+          POSTGRES_PASSWORD: fittrack_password
+          POSTGRES_DB: fittrack_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install backend deps
+        working-directory: backend
+        run: npm ci
+
+      - name: Install frontend deps
+        working-directory: frontend
+        run: npm ci
+
+      - name: Install Playwright browsers
+        working-directory: frontend
+        run: npx playwright install --with-deps chromium
+
+      - name: Start backend
+        working-directory: backend
+        run: |
+          npm run start:dev &
+          npx wait-on http://localhost:3000/api/auth/login --timeout 30000
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_USERNAME: fittrack_user
+          DB_PASSWORD: fittrack_password
+          DB_NAME: fittrack_db
+          REDIS_HOST: localhost
+          REDIS_PORT: 6379
+          JWT_ACCESS_SECRET: super_secret_access_key_123!
+          JWT_REFRESH_SECRET: super_secret_refresh_key_456!
+          JWT_ACCESS_EXPIRY: 900s
+          JWT_REFRESH_EXPIRY: 30d
+
+      - name: Run E2E tests
+        working-directory: frontend
+        run: npm run test:e2e
+        env:
+          CI: true

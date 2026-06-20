@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
-import { activityApiService, statsService } from '../services';
-import type { Activity } from '../types/activity.types';
+import { useState } from 'react';
+import { useActivitiesQuery } from '../hooks';
+import { statsService } from '../services';
 import type { DailyStats, StatsSummary, ActivityBreakdown as Breakdown } from '../services/statsService';
 import { PeriodSelector } from '../components/stats/PeriodSelector';
 import { StatsSummaryCards } from '../components/stats/StatsSummaryCards';
@@ -9,24 +9,9 @@ import { CaloriesBarChart } from '../components/stats/CaloriesBarChart';
 import { ActivityBreakdown } from '../components/stats/ActivityBreakdown';
 
 export function StatsPage() {
-  const [activities, setActivities] = useState<Activity[]>([]);
   const [period, setPeriod] = useState<'week' | 'month'>('week');
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    loadActivities();
-  }, []);
-
-  async function loadActivities() {
-    try {
-      const res = await activityApiService.listActivities({ take: 200 });
-      setActivities(res.data || []);
-    } catch {
-      // API may not be available
-    } finally {
-      setLoading(false);
-    }
-  }
+  const { data: activitiesResponse, isLoading } = useActivitiesQuery({ take: 200 });
+  const activities = activitiesResponse?.data || [];
 
   const filtered: DailyStats[] =
     period === 'week'
@@ -55,7 +40,7 @@ export function StatsPage() {
       {/* Period Toggle */}
       <PeriodSelector value={period} onChange={setPeriod} />
 
-      {loading ? (
+      {isLoading ? (
         <div className="h-48 flex items-center justify-center">
           <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
         </div>

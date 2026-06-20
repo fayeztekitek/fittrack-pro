@@ -5,6 +5,7 @@ import { Activity, ActivityType } from './entities/activity.entity';
 import { ActivitySegment } from './entities/activity-segment.entity';
 import { GPSPoint } from './entities/gps-point.entity';
 import { Achievement, AchievementBadge } from './entities/achievement.entity';
+import { AuditService } from '../audit/audit.service';
 import { Repository } from 'typeorm';
 
 describe('ActivitiesService', () => {
@@ -65,6 +66,10 @@ describe('ActivitiesService', () => {
             findOne: jest.fn(),
             find: jest.fn(),
           },
+        },
+        {
+          provide: AuditService,
+          useValue: { log: jest.fn() },
         },
       ],
     }).compile();

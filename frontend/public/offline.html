@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Offline — FitTrack Pro</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #090910;
+      color: #e2e8f0;
+      font-family: system-ui, -apple-system, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100dvh;
+      padding: 24px;
+      text-align: center;
+      gap: 16px;
+    }
+    h1 { font-size: 1.5rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; }
+    h1 span { color: #10B981; }
+    p { color: #64748b; font-size: 0.875rem; max-width: 280px; }
+    .icon { width: 64px; height: 64px; border: 2px solid #1e293b; border-radius: 16px; display: flex; align-items: center; justify-content: center; }
+    .retry { margin-top: 8px; padding: 12px 32px; background: #10B981; color: #090910; border: none; border-radius: 12px; font-weight: 700; font-size: 0.875rem; cursor: pointer; }
+    .retry:hover { background: #059669; }
+  </style>
+</head>
+<body>
+  <div class="icon">
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+    </svg>
+  </div>
+  <h1>FitTrack <span>Pro</span></h1>
+  <p>You are offline. Some features may be unavailable until you reconnect.</p>
+  <button class="retry" onclick="window.location.reload()">Try Again</button>
+</body>
+</html>

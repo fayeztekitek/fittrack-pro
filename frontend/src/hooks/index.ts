@@ -10,3 +10,9 @@ export {
 } from './useActivitySession';
 export type { UseActivitySessionOptions, SessionMetrics, SessionState } from './useActivitySession';
 export { useActivitySim } from './useActivitySim';
+export {
+  useActivitiesQuery,
+  useProfileQuery,
+  useUpdateProfileMutation,
+  useAchievementsQuery,
+} from './queries';

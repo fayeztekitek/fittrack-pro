@@ -6,6 +6,7 @@ import { ConflictException, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UsersService } from '../users/users.service';
 import { RefreshToken } from './entities/refresh-token.entity';
+import { AuditService } from '../audit/audit.service';
 import * as bcrypt from 'bcrypt';
 
 describe('AuthService', () => {
@@ -43,6 +44,10 @@ describe('AuthService', () => {
     findOne: jest.fn(),
   };
 
+  const mockAuditService = {
+    log: jest.fn(),
+  };
+
   beforeEach(async () => {
     usersService = {
       findByEmail: jest.fn(),
@@ -68,6 +73,10 @@ describe('AuthService', () => {
         {
           provide: getRepositoryToken(RefreshToken),
           useValue: mockRefreshTokenRepository,
+        },
+        {
+          provide: AuditService,
+          useValue: mockAuditService,
         },
       ],
     }).compile();

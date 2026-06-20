@@ -15,6 +15,8 @@ import { HistoryPage } from './pages/HistoryPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { TrackingPage } from './pages/TrackingPage';
 import { BottomNav } from './components/shared/BottomNav';
+import { ErrorBoundary } from './components/shared/ErrorBoundary';
+import { ToastContainer } from './components/shared/ToastContainer';
 import { LogOut } from 'lucide-react';
 
 function LoadingScreen() {
@@ -40,17 +42,17 @@ function AppLayout() {
 
   return (
     <div className="min-h-screen bg-[#090910] flex flex-col items-center text-white px-4 relative overflow-hidden select-none">
-      <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/4 w-72 h-72 bg-purple-500/10 rounded-full blur-3xl translate-x-1/2 translate-y-1/2 pointer-events-none" />
+      <div aria-hidden="true" className="absolute top-1/4 left-1/4 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
+      <div aria-hidden="true" className="absolute bottom-1/4 right-1/4 w-72 h-72 bg-purple-500/10 rounded-full blur-3xl translate-x-1/2 translate-y-1/2 pointer-events-none" />
 
       <div className="w-full max-w-[430px] flex flex-col min-h-screen py-6 z-10">
         {/* Header */}
-        <div className="flex justify-between items-center mb-6 border-b border-slate-800 pb-4">
+        <header className="flex justify-between items-center mb-6 border-b border-slate-800 pb-4">
           <div>
             <h1 className="text-2xl font-black tracking-wider uppercase">
               FitTrack <span className="text-emerald-400">Pro</span>
             </h1>
-            <p className="text-xs text-slate-500 uppercase tracking-widest mt-0.5">
+            <p className="text-xs text-slate-500 uppercase tracking-widest mt-0.5" aria-live="polite">
               {user?.name || 'Athlete'}
             </p>
           </div>
@@ -59,38 +61,49 @@ function AppLayout() {
               onClick={() =>
                 setLanguage(language === 'fr' ? 'en' : 'fr')
               }
+              aria-label={`Switch language to ${language === 'fr' ? 'English' : 'Français'}`}
               className="px-2.5 py-1 text-xs font-semibold rounded bg-slate-900 border border-slate-800 hover:bg-slate-800 text-emerald-400 transition"
             >
               {language === 'fr' ? 'EN' : 'FR'}
             </button>
             <button
               onClick={logout}
+              aria-label="Log out of your account"
               className="p-2 rounded bg-slate-900 border border-slate-800 hover:bg-red-500/10 hover:border-red-500/20 text-slate-400 hover:text-red-400 transition"
-              title="Logout"
             >
-              <LogOut size={16} />
+              <LogOut size={16} aria-hidden="true" />
             </button>
           </div>
-        </div>
+        </header>
 
         {/* Page Content */}
-        <Routes>
-          <Route path="/" element={<DashboardPage />} />
-          <Route path="/track" element={<TrackingPage />} />
-          <Route path="/stats" element={<StatsPage />} />
-          <Route path="/history" element={<HistoryPage />} />
-          <Route path="/profile" element={<ProfilePage />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+        <main>
+        <ErrorBoundary>
+          <Routes>
+            <Route path="/" element={<DashboardPage />} />
+            <Route path="/track" element={<TrackingPage />} />
+            <Route path="/stats" element={<StatsPage />} />
+            <Route path="/history" element={<HistoryPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </ErrorBoundary>
+
+        </main>
 
         {/* Footer */}
-        <p className="text-center text-xs text-slate-600 mt-auto pt-6">
-          FitTrack Pro Enterprise v1.0.0
-        </p>
+        <footer>
+          <p className="text-center text-xs text-slate-600 mt-auto pt-6">
+            FitTrack Pro Enterprise v1.0.0
+          </p>
+        </footer>
       </div>
 
       {/* Bottom Navigation */}
       {showNav && <BottomNav />}
+
+      {/* Toast Notifications */}
+      <ToastContainer />
     </div>
   );
 }

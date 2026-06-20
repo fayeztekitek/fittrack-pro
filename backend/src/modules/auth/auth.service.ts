@@ -14,6 +14,7 @@ import { RefreshToken } from './entities/refresh-token.entity';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { User } from '../users/entities/user.entity';
+import { AuditService } from '../audit/audit.service';
 
 @Injectable()
 export class AuthService {
@@ -21,6 +22,7 @@ export class AuthService {
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
+    private readonly auditService: AuditService,
     @InjectRepository(RefreshToken)
     private readonly refreshTokenRepository: Repository<RefreshToken>,
   ) {}
@@ -81,7 +83,14 @@ export class AuthService {
     );
 
     const tokens = await this.generateTokens(user);
-    
+
+    this.auditService.log({
+      action: 'user.register',
+      userId: user.id,
+      email: user.email,
+      details: { name: user.name },
+    });
+
     return {
       ...tokens,
       user: {
@@ -107,6 +116,12 @@ export class AuthService {
 
     await this.usersService.updateLastLogin(user.id);
     const tokens = await this.generateTokens(user);
+
+    this.auditService.log({
+      action: 'user.login',
+      userId: user.id,
+      email: user.email,
+    });
 
     return {
       ...tokens,
@@ -160,6 +175,12 @@ export class AuthService {
     if (tokenEntity) {
       tokenEntity.revokedAt = new Date();
       await this.refreshTokenRepository.save(tokenEntity);
+
+      this.auditService.log({
+        action: 'user.logout',
+        userId: tokenEntity.userId,
+        email: '',
+      });
     }
   }
 

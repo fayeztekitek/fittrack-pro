@@ -25,6 +25,7 @@ import {
   PauseActivityDto,
 } from './dto/activity.dto';
 import { BatchGPSPointsDto, GPSPointDto } from './dto/gps.dto';
+import { AuditService } from '../audit/audit.service';
 
 @Injectable()
 export class ActivitiesService {
@@ -39,6 +40,7 @@ export class ActivitiesService {
     private readonly gpsPointRepository: Repository<GPSPoint>,
     @InjectRepository(Achievement)
     private readonly achievementRepository: Repository<Achievement>,
+    private readonly auditService: AuditService,
   ) {}
 
   /**
@@ -62,7 +64,16 @@ export class ActivitiesService {
       metadata: { notes: dto.notes || '' },
     });
 
-    return this.activityRepository.save(activity);
+    const saved = await this.activityRepository.save(activity);
+
+    this.auditService.log({
+      action: 'activity.start',
+      userId,
+      email: '',
+      details: { activityId: saved.id, type: dto.type },
+    });
+
+    return saved;
   }
 
   /**
@@ -103,6 +114,17 @@ export class ActivitiesService {
 
     // Evaluate achievements after activity completion
     await this.evaluateAchievements(userId);
+
+    this.auditService.log({
+      action: 'activity.stop',
+      userId,
+      email: '',
+      details: {
+        activityId: saved.id,
+        distanceKm: saved.distanceKm,
+        caloriesBurned: saved.caloriesBurned,
+      },
+    });
 
     return saved;
   }

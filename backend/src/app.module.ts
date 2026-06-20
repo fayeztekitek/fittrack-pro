@@ -7,6 +7,8 @@ import { AuthModule } from './modules/auth/auth.module';
 import { ActivitiesModule } from './modules/activities/activities.module';
 import { ProfileModule } from './modules/profile/profile.module';
 import { StatsModule } from './modules/stats/stats.module';
+import { RedisModule } from './modules/redis/redis.module';
+import { AuditModule } from './modules/audit/audit.module';
 
 @Module({
   imports: [
@@ -32,10 +34,17 @@ import { StatsModule } from './modules/stats/stats.module';
     }),
 
     // Global Rate Limiting: max 100 requests per 60 seconds
-    ThrottlerModule.forRoot([{
-      ttl: 60000,
-      limit: 100,
-    }]),
+    // For horizontal scaling, replace with Redis-backed storage
+    ThrottlerModule.forRoot({
+      throttlers: [{
+        ttl: 60000,
+        limit: 100,
+      }],
+    }),
+
+    // Redis client + Audit (global modules)
+    RedisModule,
+    AuditModule,
 
     // App Feature Modules
     UsersModule,

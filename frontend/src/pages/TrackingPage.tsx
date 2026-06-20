@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Play,
   Pause,
@@ -8,6 +9,7 @@ import {
   Zap,
   TrendingUp,
   Loader2,
+  CheckCircle,
 } from 'lucide-react';
 import {
   useGpsTracker,
@@ -16,15 +18,19 @@ import {
   useActivitySession,
   useActivitySim,
 } from '../hooks';
+import { useUIStore } from '../stores/uiStore';
 import { activityApiService } from '../services';
 import { ActivityTypeValues, ACTIVITY_ICONS } from '../types/activity.types';
 import type { ActivityType } from '../types/activity.types';
 import { useAuthStore } from '../stores/authStore';
 import { GpsMap } from '../components/track/GpsMap';
 import { CyclingSegments } from '../components/track/CyclingSegments';
+import type { SessionMetrics } from '../hooks/useActivitySession';
 
 export const TrackingPage: React.FC = () => {
   const { user } = useAuthStore();
+  const navigate = useNavigate();
+  const addToast = useUIStore((s) => s.addToast);
   const [selectedActivityType, setSelectedActivityType] = useState<ActivityType>(
     ActivityTypeValues.RUNNING as ActivityType,
   );
@@ -32,6 +38,7 @@ export const TrackingPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [useSimulation, setUseSimulation] = useState(false);
   const [segments, setSegments] = useState<{ km: number; speed: number; time: number }[]>([]);
+  const [completedMetrics, setCompletedMetrics] = useState<SessionMetrics | null>(null);
   const segDistRef = useRef(0);
   const segKmRef = useRef(0);
 
@@ -202,6 +209,24 @@ export const TrackingPage: React.FC = () => {
           ? currentMetrics.distanceKm
           : session.estimateDistanceFromSteps(currentMetrics.totalSteps);
 
+      const finalMetrics = {
+        ...currentMetrics,
+        distanceKm: finalDistance,
+        caloriesBurned: calories,
+        avgPowerWatts:
+          selectedActivityType === ActivityTypeValues.CYCLING
+            ? powerMeter.avgPowerWatts
+            : currentMetrics.avgPowerWatts,
+        maxPowerWatts:
+          selectedActivityType === ActivityTypeValues.CYCLING
+            ? powerMeter.maxPowerWatts
+            : currentMetrics.maxPowerWatts,
+        avgCadenceRpm:
+          selectedActivityType === ActivityTypeValues.CYCLING
+            ? currentMetrics.avgCadenceRpm
+            : undefined,
+      };
+
       await activityApiService.stopActivity(session.sessionId, {
         durationSeconds: currentMetrics.durationSeconds,
         distanceKm: finalDistance,
@@ -213,26 +238,19 @@ export const TrackingPage: React.FC = () => {
             ? (finalDistance / (currentMetrics.durationSeconds / 3600)) * 1
             : 0,
         elevationGainM: currentMetrics.elevationGainM,
-        avgPowerWatts:
-          selectedActivityType === ActivityTypeValues.CYCLING
-            ? powerMeter.avgPowerWatts
-            : undefined,
-        maxPowerWatts:
-          selectedActivityType === ActivityTypeValues.CYCLING
-            ? powerMeter.maxPowerWatts
-            : undefined,
-        avgCadenceRpm:
-          selectedActivityType === ActivityTypeValues.CYCLING
-            ? currentMetrics.avgCadenceRpm
-            : undefined,
+        avgPowerWatts: finalMetrics.avgPowerWatts,
+        maxPowerWatts: finalMetrics.maxPowerWatts,
+        avgCadenceRpm: finalMetrics.avgCadenceRpm,
       });
 
       await session.stop();
+      setCompletedMetrics(finalMetrics as SessionMetrics);
 
       // Reset all counters
       stepCounter.reset();
       powerMeter.reset();
     } catch (err: any) {
+      addToast('error', err.message || 'Failed to save activity');
       setError(err.message || 'Failed to stop activity');
       console.error('Stop activity error:', err);
     } finally {
@@ -243,7 +261,7 @@ export const TrackingPage: React.FC = () => {
   const isActivitySelected = session.sessionId !== null;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-950 p-4 pb-24">
+    <><div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-950 p-4 pb-24">
       <div className="max-w-2xl mx-auto space-y-6">
         {/* Header */}
         <div className="pt-4">
@@ -485,5 +503,86 @@ export const TrackingPage: React.FC = () => {
         </div>
       </div>
     </div>
-  );
+
+    {/* Post-Activity Summary Modal */}
+    {completedMetrics && (
+      <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div className="w-full max-w-md bg-slate-900 border border-slate-700 rounded-3xl p-6 shadow-2xl animate-fade-in">
+          {/* Header */}
+          <div className="text-center mb-6">
+            <div className="text-4xl mb-2">{ACTIVITY_ICONS[selectedActivityType]}</div>
+            <h2 className="text-xl font-bold text-white capitalize">
+              {selectedActivityType.replace('_', ' ')} Complete
+            </h2>
+            <p className="text-xs text-slate-500 mt-1">Activity saved successfully</p>
+          </div>
+
+          {/* Metrics Grid */}
+          <div className="grid grid-cols-2 gap-3 mb-6">
+            <div className="p-3 bg-slate-800 rounded-xl border border-slate-700 text-center">
+              <div className="text-xs text-slate-400 mb-1">Duration</div>
+              <div className="text-lg font-bold text-emerald-400">
+                {Math.floor(completedMetrics.durationSeconds / 60)}:
+                {(completedMetrics.durationSeconds % 60).toString().padStart(2, '0')}
+              </div>
+            </div>
+            <div className="p-3 bg-slate-800 rounded-xl border border-slate-700 text-center">
+              <div className="text-xs text-slate-400 mb-1">Distance</div>
+              <div className="text-lg font-bold text-white">
+                {completedMetrics.distanceKm.toFixed(2)} <span className="text-xs">km</span>
+              </div>
+            </div>
+            <div className="p-3 bg-slate-800 rounded-xl border border-slate-700 text-center">
+              <div className="text-xs text-slate-400 mb-1">Calories</div>
+              <div className="text-lg font-bold text-orange-400">
+                {Math.round(completedMetrics.caloriesBurned)} <span className="text-xs">kcal</span>
+              </div>
+            </div>
+            <div className="p-3 bg-slate-800 rounded-xl border border-slate-700 text-center">
+              <div className="text-xs text-slate-400 mb-1">Avg Speed</div>
+              <div className="text-lg font-bold text-blue-400">
+                {completedMetrics.avgSpeedKmh.toFixed(1)} <span className="text-xs">km/h</span>
+              </div>
+            </div>
+            {completedMetrics.totalSteps > 0 && (
+              <div className="p-3 bg-slate-800 rounded-xl border border-slate-700 text-center">
+                <div className="text-xs text-slate-400 mb-1">Steps</div>
+                <div className="text-lg font-bold text-purple-400">
+                  {completedMetrics.totalSteps.toLocaleString()}
+                </div>
+              </div>
+            )}
+            {selectedActivityType === ActivityTypeValues.CYCLING && completedMetrics.avgPowerWatts && (
+              <div className="p-3 bg-slate-800 rounded-xl border border-slate-700 text-center">
+                <div className="text-xs text-slate-400 mb-1">Power</div>
+                <div className="text-lg font-bold text-yellow-400">
+                  {completedMetrics.avgPowerWatts} <span className="text-xs">W</span>
+                </div>
+              </div>
+            )}
+            {selectedActivityType === ActivityTypeValues.CYCLING && completedMetrics.avgCadenceRpm && (
+              <div className="p-3 bg-slate-800 rounded-xl border border-slate-700 text-center">
+                <div className="text-xs text-slate-400 mb-1">Cadence</div>
+                <div className="text-lg font-bold text-pink-400">
+                  {completedMetrics.avgCadenceRpm} <span className="text-xs">rpm</span>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Done button */}
+          <button
+            onClick={() => {
+              setCompletedMetrics(null);
+              navigate('/history');
+            }}
+            className="w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl shadow-lg shadow-emerald-500/20 transition flex items-center justify-center gap-2"
+          >
+            <CheckCircle size={18} />
+            View in History
+          </button>
+        </div>
+      </div>
+    )}
+  </>);
 };
